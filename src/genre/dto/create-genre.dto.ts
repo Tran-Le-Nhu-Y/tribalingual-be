@@ -1,20 +1,19 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEmail } from 'class-validator';
 
-export default class CreateCatBody {
+export default class CreateGenreBody {
   @ApiProperty({
-    description: 'Cat name',
+    description: 'Genre name',
+    minLength: 1,
+    maxLength: 100,
+  })
+  name: string;
+  @ApiProperty({
+    description: 'Genre description',
     minLength: 1,
     maxLength: 255,
   })
-  name: string;
-
-  @ApiProperty({
-    description: 'Cat age',
-    minimum: 0,
-    maximum: 30,
-  })
-  age: number;
+  description: string;
 
   @IsEmail()
   email: string;

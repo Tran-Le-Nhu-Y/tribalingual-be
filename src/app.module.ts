@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import configuration from '../config/configuration';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CatModule } from './cats/cat.module';
+import { GenreModule } from './genre/genre.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { CatModule } from './cats/cat.module';
       inject: [ConfigService],
     }),
     CatModule,
+    GenreModule,
   ],
 })
 export class AppModule {}
