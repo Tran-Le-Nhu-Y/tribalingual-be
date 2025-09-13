@@ -2,8 +2,8 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import configuration from '../config/configuration';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { CatModule } from './cats/cat.module';
 import { GenreModule } from './genre/genre.module';
+import { FileModule } from './file/file.module';
 
 @Module({
   imports: [
@@ -22,8 +22,9 @@ import { GenreModule } from './genre/genre.module';
       }),
       inject: [ConfigService],
     }),
-    CatModule,
+
     GenreModule,
+    FileModule,
   ],
 })
 export class AppModule {}

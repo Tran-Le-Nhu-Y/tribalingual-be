@@ -1,5 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail } from 'class-validator';
 
 export default class CreateGenreBody {
   @ApiProperty({
@@ -14,7 +13,4 @@ export default class CreateGenreBody {
     maxLength: 255,
   })
   description: string;
-
-  @IsEmail()
-  email: string;
 }
