@@ -7,6 +7,7 @@ import FileResponse from './dto/file-response.dto';
 export class FileMapper {
   toModel(entity: FileEntity) {
     return {
+      id: entity.id,
       name: entity.name,
       mime_type: entity.mime_type,
       save_path: entity.save_path,

@@ -1,6 +1,9 @@
 import {
   Controller,
+  Delete,
   Get,
+  NotFoundException,
+  Param,
   ParseFilePipeBuilder,
   Post,
   UploadedFile,
@@ -25,10 +28,19 @@ export class FileController {
     return files.map((model) => this.mapper.toResponse(model));
   }
 
+  @Get('/file/:id')
+  @ApiOperation({ summary: 'Get file by id' })
+  async getFileById(@Param('id') id: string) {
+    const file = await this.service.findOne(id);
+    if (!file) {
+      throw new NotFoundException(`File with id ${id} not found`);
+    }
+    return this.mapper.toResponse(file);
+  }
+
   @Post('/upload')
   @ApiOperation({ summary: 'Upload a file (single file), return id' })
   @ApiConsumes('multipart/form-data')
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument
   @UseInterceptors(FileInterceptor('file'))
   @ApiBody({
     schema: {
@@ -41,7 +53,7 @@ export class FileController {
       },
     },
   })
-  async upload(
+  async uploadFile(
     @UploadedFile(
       new ParseFilePipeBuilder()
         //.addFileTypeValidator({ fileType: /(jpg|jpeg|png)$/ }) // only jpg, jpeg, png
@@ -52,5 +64,15 @@ export class FileController {
   ): Promise<{ id: string }> {
     const savedFile = await this.service.save_file(file);
     return { id: savedFile.id };
+  }
+
+  @Delete('/delete/:id')
+  @ApiOperation({ summary: 'Delete a file by id' })
+  async deleteFile(@Param('id') id: string) {
+    const deleted = await this.service.remove(id);
+    if (!deleted) {
+      throw new NotFoundException(`File with id ${id} not found`);
+    }
+    return { message: `File with id ${id} deleted successfully` };
   }
 }

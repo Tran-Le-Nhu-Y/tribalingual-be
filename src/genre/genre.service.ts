@@ -4,6 +4,7 @@ import { GenreMapper } from './genre.mapper';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable } from '@nestjs/common';
 import Genre from './interface/genre.interface';
+import CreateGenreBody from './dto/create-genre.dto';
 
 @Injectable()
 export class GenreService {
@@ -18,18 +19,21 @@ export class GenreService {
     return entities.map((entity) => this.mapper.toModel(entity));
   }
 
-  async findOne(id: number): Promise<Genre | null> {
+  async findOne(id: string): Promise<Genre | null> {
     const entity = await this.genreRepository.findOneBy({ id });
     return entity !== null ? this.mapper.toModel(entity) : null;
   }
 
-  async create(data: Genre) {
-    const entity = { ...data } as GenreEntity;
+  async create(data: CreateGenreBody): Promise<string> {
+    const entity = this.genreRepository.create({
+      name: data.name,
+      description: data.description,
+    });
     const savedEntity = await this.genreRepository.save(entity);
     return savedEntity.id;
   }
 
-  async update(id: number, data: Partial<Genre>): Promise<Genre | null> {
+  async update(id: string, data: Partial<Genre>): Promise<Genre | null> {
     const entity = await this.genreRepository.findOneBy({ id });
     if (!entity) {
       return null;
@@ -40,7 +44,7 @@ export class GenreService {
     return this.mapper.toModel(savedEntity);
   }
 
-  async remove(id: number): Promise<boolean> {
+  async remove(id: string): Promise<boolean> {
     const result = await this.genreRepository.delete(id);
     return result.affected !== 0; // true if a row was deleted, false otherwise
   }

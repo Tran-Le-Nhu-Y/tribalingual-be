@@ -1,6 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
 export default class GenreResponse {
   @ApiProperty({
+    description: 'Genre id',
+    format: 'uuid',
+  })
+  id: string;
+  @ApiProperty({
     description: 'Genre name',
     minLength: 1,
     maxLength: 100,

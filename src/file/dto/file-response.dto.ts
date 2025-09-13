@@ -1,6 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
 export default class FileResponse {
   @ApiProperty({
+    description: 'File id',
+    format: 'uuid',
+  })
+  id: string;
+  @ApiProperty({
     description: 'File name',
     minLength: 1,
     maxLength: 100,

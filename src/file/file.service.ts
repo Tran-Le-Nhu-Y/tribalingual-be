@@ -39,4 +39,9 @@ export class FileService {
     });
     return this.fileRepository.save(fileRecord);
   }
+
+  async remove(id: string): Promise<boolean> {
+    const result = await this.fileRepository.delete(id);
+    return result.affected !== 0; // true if a row was deleted, false otherwise
+  }
 }
