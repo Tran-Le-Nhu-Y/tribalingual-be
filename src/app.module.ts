@@ -4,6 +4,7 @@ import configuration from '../config/configuration';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { GenreModule } from './genre/genre.module';
 import { FileModule } from './file/file.module';
+import { CommentModule } from './story-comment/comment.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { FileModule } from './file/file.module';
 
     GenreModule,
     FileModule,
+    CommentModule,
   ],
 })
 export class AppModule {}
