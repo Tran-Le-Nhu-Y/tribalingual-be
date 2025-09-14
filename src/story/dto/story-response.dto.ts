@@ -24,5 +24,5 @@ export default class StoryResponse {
   commentCount: number;
 
   @ApiProperty({ description: 'Number of likes (favorites)' })
-  likeCount: number;
+  favoriteCount: number;
 }

@@ -6,6 +6,7 @@ import {
   Param,
   ParseFilePipeBuilder,
   Post,
+  Res,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
@@ -13,7 +14,8 @@ import { FileService } from './file.service';
 import { FileMapper } from './file.mapper';
 import { ApiBody, ApiConsumes, ApiOperation } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
-
+import * as fs from 'fs';
+import express from 'express';
 @Controller({ path: '/api/v1/file' })
 export class FileController {
   constructor(
@@ -28,7 +30,7 @@ export class FileController {
     return files.map((model) => this.mapper.toResponse(model));
   }
 
-  @Get('/file/:id')
+  @Get('/:id')
   @ApiOperation({ summary: 'Get file by id' })
   async getFileById(@Param('id') id: string) {
     const file = await this.service.findOne(id);
@@ -36,6 +38,23 @@ export class FileController {
       throw new NotFoundException(`File with id ${id} not found`);
     }
     return this.mapper.toResponse(file);
+  }
+
+  @Get('/:id/show')
+  @ApiOperation({ summary: 'Show image by id' })
+  async showFile(@Param('id') id: string, @Res() res: express.Response) {
+    const file = await this.service.findOne(id);
+    if (!file) {
+      throw new NotFoundException(`File with id ${id} not found`);
+    }
+
+    if (!fs.existsSync(file.save_path)) {
+      throw new NotFoundException(`File not found on disk: ${file.save_path}`);
+    }
+
+    res.setHeader('Content-Type', file.mime_type);
+    const fileStream = fs.createReadStream(file.save_path);
+    fileStream.pipe(res);
   }
 
   @Post('/upload')

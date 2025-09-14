@@ -13,7 +13,7 @@ export class StoryMapper {
       publishedDate: entity.publishedDate,
       viewCount: entity.viewCount,
       commentCount: entity.commentCount,
-      likeCount: entity.likeCount,
+      favoriteCount: entity.favoriteCount,
     } as Story;
   }
 

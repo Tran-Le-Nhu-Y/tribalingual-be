@@ -1,6 +1,10 @@
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { StoryMapper } from './mapper/story.mapper';
 import Story from './interface/story.interface';
 import StoryEntity from './entity/story.entity';
@@ -9,6 +13,8 @@ import { CreateCommentBody } from './dto/create-comment.dto';
 import { UserEntity } from 'src/user/entity/user.entity';
 import Comment from './interface/comment.interface';
 import { CommentMapper } from './mapper/comment.mapper';
+import { CreateFavoriteBody } from './dto/create-favorite.dto';
+import { FavoriteEntity } from './entity/favorite.entity';
 
 @Injectable()
 export class StoryService {
@@ -20,6 +26,9 @@ export class StoryService {
     @InjectRepository(CommentEntity)
     private readonly commentRepository: Repository<CommentEntity>,
     private readonly commentMapper: CommentMapper,
+
+    @InjectRepository(FavoriteEntity)
+    private readonly favoriteRepository: Repository<FavoriteEntity>,
 
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
@@ -60,6 +69,7 @@ export class StoryService {
     return result.affected !== 0; // true if a row was deleted, false otherwise
   }
 
+  //Comment methods
   async addComment(commentData: CreateCommentBody): Promise<string> {
     const story = await this.storyRepository.findOneBy({
       id: commentData.storyId,
@@ -70,11 +80,11 @@ export class StoryService {
       );
     }
     const user = await this.userRepository.findOneBy({
-      id: commentData.authorId,
+      id: commentData.userId,
     });
     if (!user) {
       throw new NotFoundException(
-        `User with id ${commentData.authorId} not found`,
+        `User with id ${commentData.userId} not found`,
       );
     }
     const comment = this.commentRepository.create({
@@ -86,7 +96,7 @@ export class StoryService {
     const savedComment = await this.commentRepository.save(comment);
 
     // Update comment count
-    story.commentCount = story.commentCount + 1;
+    story.commentCount = (story.commentCount || 0) + 1;
     await this.storyRepository.save(story);
 
     return savedComment.id;
@@ -120,7 +130,96 @@ export class StoryService {
 
   async removeComment(commentId: string): Promise<boolean> {
     if (!commentId) return false;
+
+    const comment = await this.commentRepository.findOne({
+      where: { id: commentId },
+      relations: ['story'],
+    });
+    if (!comment) {
+      throw new NotFoundException(`Comment with id ${commentId} not found`);
+    }
+
     const result = await this.commentRepository.delete(commentId);
-    return result.affected !== 0; // true if a row was deleted, false otherwise
+
+    if (result.affected && result.affected > 0) {
+      // Update commentCount
+      const story = comment.story;
+      story.commentCount = Math.max((story.commentCount || 1) - 1, 0);
+      await this.storyRepository.save(story);
+
+      return true;
+    }
+    return false; // true if a row was deleted, false otherwise
+  }
+
+  //Favorite methods
+  async addFavorite(favoriteData: CreateFavoriteBody): Promise<boolean> {
+    const story = await this.storyRepository.findOneBy({
+      id: favoriteData.storyId,
+    });
+    if (!story) {
+      throw new NotFoundException(
+        `Story with id ${favoriteData.storyId} not found`,
+      );
+    }
+    const user = await this.userRepository.findOneBy({
+      id: favoriteData.userId,
+    });
+    if (!user) {
+      throw new NotFoundException(
+        `User with id ${favoriteData.userId} not found`,
+      );
+    }
+
+    const existingFavorite = await this.favoriteRepository.findOne({
+      where: {
+        story: { id: favoriteData.storyId },
+        user: { id: favoriteData.userId },
+      },
+      relations: ['story', 'user'],
+    });
+
+    if (existingFavorite) {
+      throw new ConflictException('Already favorited');
+    }
+
+    const favorite = this.favoriteRepository.create({
+      story: story,
+      user: user,
+      addedDate: favoriteData.addedDate || new Date(),
+    });
+    const savedFavorite = await this.favoriteRepository.save(favorite);
+
+    // Update favorite count
+    story.favoriteCount = (story.favoriteCount || 0) + 1;
+    await this.storyRepository.save(story);
+
+    return savedFavorite ? true : false;
+  }
+
+  async removeFavorite(storyId: string, userId: string): Promise<boolean> {
+    if (!storyId && !userId) return false;
+
+    const favorite = await this.favoriteRepository.findOne({
+      where: { storyId: storyId, userId: userId },
+      relations: ['story'],
+    });
+    if (!favorite) {
+      throw new NotFoundException(
+        `Favorite with story id ${storyId} and user id ${storyId} not found`,
+      );
+    }
+
+    const result = await this.favoriteRepository.delete({ storyId, userId });
+
+    if (result.affected && result.affected > 0) {
+      // Update commentCount
+      const story = favorite.story;
+      story.favoriteCount = Math.max((story.favoriteCount || 1) - 1, 0);
+      await this.storyRepository.save(story);
+
+      return true;
+    }
+    return false; // true if a row was deleted, false otherwise
   }
 }

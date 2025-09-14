@@ -24,7 +24,7 @@ export default class StoryEntity {
   commentCount: number;
 
   @Column({ default: 0 })
-  likeCount: number;
+  favoriteCount: number;
 
   @OneToMany(() => CommentEntity, (comment) => comment.story)
   comments: CommentEntity[];

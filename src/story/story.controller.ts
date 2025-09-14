@@ -14,6 +14,7 @@ import StoryResponse from './dto/story-response.dto';
 import { CreateStoryBody } from './dto/create-story.dto';
 import { CreateCommentBody } from './dto/create-comment.dto';
 import { CommentResponse } from './dto/comment-response.dto';
+import { CreateFavoriteBody } from './dto/create-favorite.dto';
 
 @ApiTags('Story')
 @Controller({ path: '/api/v1/story' })
@@ -59,6 +60,7 @@ export class StoryController {
     return { message: `Story with id ${id} deleted successfully` };
   }
 
+  // Comment methods
   @Post(':id/comment/create')
   @ApiOperation({ summary: 'Comment story' })
   async addComment(@Body() commentData: CreateCommentBody) {
@@ -83,5 +85,37 @@ export class StoryController {
       throw new NotFoundException(`Comment with id ${commentId} not found`);
     }
     return { message: `Comment with id ${commentId} deleted successfully` };
+  }
+
+  // Favorite methods
+  @Post(':id/favorite/add')
+  @ApiOperation({ summary: 'Add story to favorites' })
+  async addFavorite(@Body() favoriteData: CreateFavoriteBody) {
+    const success = await this.service.addFavorite(favoriteData);
+    if (!success) {
+      throw new NotFoundException(
+        `Could not add story ${favoriteData.storyId} to favorites`,
+      );
+    }
+    return {
+      message: `Story with id ${favoriteData.storyId} added to favorites successfully by user with id ${favoriteData.userId}`,
+    };
+  }
+
+  @Delete(':storyId/favorite/delete/:userId')
+  @ApiOperation({ summary: 'Delete a favorite by story id and user id' })
+  async deleteFavorite(
+    @Param('storyId') storyId: string,
+    @Param('userId') userId: string,
+  ) {
+    const deleted = await this.service.removeFavorite(storyId, userId);
+    if (!deleted) {
+      throw new NotFoundException(
+        `Favorite with story id ${storyId} and user id ${storyId} not found`,
+      );
+    }
+    return {
+      message: `Favorite with story id ${storyId} and user id ${storyId} deleted successfully`,
+    };
   }
 }

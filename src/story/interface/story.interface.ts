@@ -5,5 +5,5 @@ export default interface Story {
   publishedDate: Date;
   viewCount: number;
   commentCount: number;
-  likeCount: number;
+  favoriteCount: number;
 }

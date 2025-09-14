@@ -1,4 +1,4 @@
-import { Entity, Column, ManyToOne, PrimaryColumn } from 'typeorm';
+import { Entity, Column, ManyToOne, PrimaryColumn, JoinColumn } from 'typeorm';
 import StoryEntity from './story.entity';
 import { UserEntity } from 'src/user/entity/user.entity';
 
@@ -10,16 +10,18 @@ export class FavoriteEntity {
   @PrimaryColumn('uuid')
   userId: string;
 
-  @Column({ type: 'timestamp' })
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   addedDate: Date;
 
   @ManyToOne(() => StoryEntity, (story) => story.favorites, {
     onDelete: 'CASCADE',
   })
+  @JoinColumn({ name: 'storyId' })
   story: StoryEntity;
 
   @ManyToOne(() => UserEntity, (user) => user.favorites, {
     onDelete: 'CASCADE',
   })
+  @JoinColumn({ name: 'userId' })
   user: UserEntity;
 }
