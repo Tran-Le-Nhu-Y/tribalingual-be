@@ -2,7 +2,7 @@ import { Repository } from 'typeorm';
 import GenreEntity from './entity/genre.entity';
 import { GenreMapper } from './genre.mapper';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import Genre from './interface/genre.interface';
 import CreateGenreBody from './dto/create-genre.dto';
 
@@ -21,6 +21,9 @@ export class GenreService {
 
   async findOne(id: string): Promise<Genre | null> {
     const entity = await this.genreRepository.findOneBy({ id });
+    if (!entity) {
+      throw new NotFoundException(`Genre with id ${id} not found`);
+    }
     return entity !== null ? this.mapper.toModel(entity) : null;
   }
 
@@ -36,7 +39,7 @@ export class GenreService {
   async update(id: string, data: Partial<Genre>): Promise<Genre | null> {
     const entity = await this.genreRepository.findOneBy({ id });
     if (!entity) {
-      return null;
+      throw new NotFoundException(`Genre with id ${id} not found`);
     }
     const updatedEntity = this.genreRepository.merge(entity, data);
     const savedEntity = await this.genreRepository.save(updatedEntity);

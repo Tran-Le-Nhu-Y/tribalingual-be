@@ -1,0 +1,22 @@
+import { CommentEntity } from 'src/story/entity/comment.entity';
+import { FavoriteEntity } from 'src/story/entity/favorite.entity';
+import { ViewEntity } from 'src/story/entity/view.entity';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+
+@Entity()
+export class UserEntity {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @Column()
+  username: string;
+
+  @OneToMany(() => CommentEntity, (comment) => comment.user)
+  comments: CommentEntity[];
+
+  @OneToMany(() => ViewEntity, (view) => view.user)
+  views: ViewEntity[];
+
+  @OneToMany(() => FavoriteEntity, (favorite) => favorite.user)
+  favorites: FavoriteEntity[];
+}

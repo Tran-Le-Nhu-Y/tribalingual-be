@@ -1,5 +1,7 @@
 export default interface Comment {
   id: string;
+  storyId: string;
+  userId: string;
   content: string;
-  date: Date;
+  createdAt: Date;
 }

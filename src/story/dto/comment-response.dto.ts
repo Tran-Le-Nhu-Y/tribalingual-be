@@ -1,5 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-export default class CommentResponse {
+import UserResponse from 'src/user/dto/user-response';
+import StoryResponse from './story-response.dto';
+export class CommentResponse {
   @ApiProperty({
     description: 'Comment id',
     format: 'uuid',
@@ -13,5 +15,11 @@ export default class CommentResponse {
   @ApiProperty({
     description: 'Date comment was created',
   })
-  date: Date;
+  createdAt: Date;
+
+  @ApiProperty({ type: () => StoryResponse })
+  story: StoryResponse;
+
+  @ApiProperty({ type: () => UserResponse })
+  user: UserResponse;
 }
