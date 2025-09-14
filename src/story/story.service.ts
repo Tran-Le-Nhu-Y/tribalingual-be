@@ -15,6 +15,8 @@ import Comment from './interface/comment.interface';
 import { CommentMapper } from './mapper/comment.mapper';
 import { CreateFavoriteBody } from './dto/create-favorite.dto';
 import { FavoriteEntity } from './entity/favorite.entity';
+import { CreateViewBody } from './dto/create-view.dto';
+import { ViewEntity } from './entity/view.entity';
 
 @Injectable()
 export class StoryService {
@@ -29,6 +31,9 @@ export class StoryService {
 
     @InjectRepository(FavoriteEntity)
     private readonly favoriteRepository: Repository<FavoriteEntity>,
+
+    @InjectRepository(ViewEntity)
+    private readonly viewRepository: Repository<ViewEntity>,
 
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
@@ -221,5 +226,49 @@ export class StoryService {
       return true;
     }
     return false; // true if a row was deleted, false otherwise
+  }
+
+  //View methods
+  async addView(viewData: CreateViewBody): Promise<boolean> {
+    const story = await this.storyRepository.findOneBy({
+      id: viewData.storyId,
+    });
+    if (!story) {
+      throw new NotFoundException(
+        `Story with id ${viewData.storyId} not found`,
+      );
+    }
+    const user = await this.userRepository.findOneBy({
+      id: viewData.userId,
+    });
+    if (!user) {
+      throw new NotFoundException(`User with id ${viewData.userId} not found`);
+    }
+
+    const existingView = await this.viewRepository.findOne({
+      where: {
+        story: { id: viewData.storyId },
+        user: { id: viewData.userId },
+      },
+      relations: ['story', 'user'],
+    });
+
+    if (existingView) {
+      existingView.lastViewDate = viewData.lastViewDate || new Date();
+      await this.viewRepository.save(existingView);
+    } else {
+      const view = this.viewRepository.create({
+        story: story,
+        user: user,
+        lastViewDate: viewData.lastViewDate || new Date(),
+      });
+      await this.viewRepository.save(view);
+
+      // Update view count
+      story.viewCount = (story.viewCount || 0) + 1;
+      await this.storyRepository.save(story);
+    }
+
+    return true;
   }
 }

@@ -15,6 +15,7 @@ import { CreateStoryBody } from './dto/create-story.dto';
 import { CreateCommentBody } from './dto/create-comment.dto';
 import { CommentResponse } from './dto/comment-response.dto';
 import { CreateFavoriteBody } from './dto/create-favorite.dto';
+import { CreateViewBody } from './dto/create-view.dto';
 
 @ApiTags('Story')
 @Controller({ path: '/api/v1/story' })
@@ -89,7 +90,7 @@ export class StoryController {
 
   // Favorite methods
   @Post(':id/favorite/add')
-  @ApiOperation({ summary: 'Add story to favorites' })
+  @ApiOperation({ summary: 'Add favorite for story' })
   async addFavorite(@Body() favoriteData: CreateFavoriteBody) {
     const success = await this.service.addFavorite(favoriteData);
     if (!success) {
@@ -98,7 +99,7 @@ export class StoryController {
       );
     }
     return {
-      message: `Story with id ${favoriteData.storyId} added to favorites successfully by user with id ${favoriteData.userId}`,
+      message: `Story with id ${favoriteData.storyId} added to favorite successfully by user with id ${favoriteData.userId}`,
     };
   }
 
@@ -116,6 +117,21 @@ export class StoryController {
     }
     return {
       message: `Favorite with story id ${storyId} and user id ${storyId} deleted successfully`,
+    };
+  }
+
+  // View methods
+  @Post(':id/view/add')
+  @ApiOperation({ summary: 'Add view for story' })
+  async addView(@Body() viewData: CreateViewBody) {
+    const success = await this.service.addView(viewData);
+    if (!success) {
+      throw new NotFoundException(
+        `Could not add story ${viewData.storyId} to favorites`,
+      );
+    }
+    return {
+      message: `Story with id ${viewData.storyId} added to view successfully by user with id ${viewData.userId}`,
     };
   }
 }
