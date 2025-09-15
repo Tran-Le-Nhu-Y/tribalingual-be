@@ -10,13 +10,21 @@ export default class FileResponse {
     minLength: 1,
     maxLength: 100,
   })
-  name: string;
+  filename: string;
   @ApiProperty({
     description: 'File mime type',
   })
   mime_type: string;
   @ApiProperty({
-    description: 'File save path',
+    description: 'File size',
   })
-  save_path: string;
+  size: number;
+  @ApiProperty({
+    description: 'File URL',
+  })
+  url: string;
+  @ApiProperty({
+    description: 'File public id (for cloudinary)',
+  })
+  publicId: string;
 }

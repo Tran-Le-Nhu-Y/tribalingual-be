@@ -6,16 +6,19 @@ import {
   Param,
   ParseFilePipeBuilder,
   Post,
-  Res,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileService } from './file.service';
 import { FileMapper } from './file.mapper';
-import { ApiBody, ApiConsumes, ApiOperation } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiConsumes,
+  ApiInternalServerErrorResponse,
+  ApiOperation,
+} from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
-import * as fs from 'fs';
-import express from 'express';
+
 @Controller({ path: '/api/v1/file' })
 export class FileController {
   constructor(
@@ -42,19 +45,14 @@ export class FileController {
 
   @Get('/:id/show')
   @ApiOperation({ summary: 'Show image by id' })
-  async showFile(@Param('id') id: string, @Res() res: express.Response) {
+  async showFile(@Param('id') id: string) {
     const file = await this.service.findOne(id);
     if (!file) {
       throw new NotFoundException(`File with id ${id} not found`);
     }
 
-    if (!fs.existsSync(file.save_path)) {
-      throw new NotFoundException(`File not found on disk: ${file.save_path}`);
-    }
-
-    res.setHeader('Content-Type', file.mime_type);
-    const fileStream = fs.createReadStream(file.save_path);
-    fileStream.pipe(res);
+    // Cloudinary save url (https://res.cloudinary.com/xxx/image/upload/abc.jpg)
+    return { url: file.url };
   }
 
   @Post('/upload')
@@ -72,6 +70,7 @@ export class FileController {
       },
     },
   })
+  @ApiInternalServerErrorResponse({ description: 'File upload failed' })
   async uploadFile(
     @UploadedFile(
       new ParseFilePipeBuilder()
@@ -80,9 +79,9 @@ export class FileController {
         .build({ errorHttpStatusCode: 422 }), // return 422 if invalid
     )
     file: Express.Multer.File,
-  ): Promise<{ id: string }> {
+  ) {
     const savedFile = await this.service.save_file(file);
-    return { id: savedFile.id };
+    return savedFile;
   }
 
   @Delete('/delete/:id')

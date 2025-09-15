@@ -31,13 +31,19 @@ export class FileService {
     if (!file) {
       throw new BadRequestException('No file uploaded');
     }
-
-    const fileRecord = this.fileRepository.create({
-      name: file.originalname,
-      mime_type: file.mimetype,
-      save_path: file.path, // Multer creates the file at this path
+    console.log('Cloudinary config:', {
+      cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+      api_key: process.env.CLOUDINARY_API_KEY,
+      api_secret: process.env.CLOUDINARY_API_SECRET ? '***' : 'MISSING',
     });
-    return this.fileRepository.save(fileRecord);
+    const fileRecord = this.fileRepository.create({
+      filename: file.originalname,
+      mime_type: file.mimetype,
+      size: file.size,
+      url: file.path, // Cloudinary URL
+      publicId: file.filename, // Cloudinary public_id
+    });
+    return await this.fileRepository.save(fileRecord);
   }
 
   async remove(id: string): Promise<boolean> {

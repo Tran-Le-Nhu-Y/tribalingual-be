@@ -4,3 +4,7 @@ database:
   username: test
   password: test
   dbname: test_db
+cloudinary:
+  cloud_name: test
+  api_key: test
+  api_secret: test

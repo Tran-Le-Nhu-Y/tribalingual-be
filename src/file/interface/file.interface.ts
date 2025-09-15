@@ -1,6 +1,8 @@
 export default interface File {
   id: string;
-  name: string;
+  filename: string;
   mime_type: string;
-  save_path: string;
+  size: number;
+  url: string;
+  publicId: string;
 }

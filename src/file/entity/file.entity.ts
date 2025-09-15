@@ -6,11 +6,17 @@ export default class FileEntity {
   id: string;
 
   @Column()
-  name: string;
+  filename: string;
 
   @Column()
   mime_type: string;
 
   @Column()
-  save_path: string;
+  size: number;
+
+  @Column()
+  url: string;
+
+  @Column()
+  publicId: string; //  cloudinary
 }

@@ -5,21 +5,36 @@ import { FileController } from './file.controller';
 import { FileService } from './file.service';
 import { FileMapper } from './file.mapper';
 import { MulterModule } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import * as path from 'path';
-import { v4 as uuidv4 } from 'uuid';
+import { v2 as cloudinary } from 'cloudinary';
+import { CloudinaryStorage } from 'multer-storage-cloudinary';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([FileEntity]),
-    MulterModule.register({
-      storage: diskStorage({
-        destination: './uploads',
-        filename: (_req, file, cb) => {
-          const filename = uuidv4() + path.extname(file.originalname);
-          cb(null, filename);
-        },
-      }),
+    MulterModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => {
+        // 🔹 Config Cloudinary
+        cloudinary.config({
+          cloud_name: configService.get('cloudinary.cloud_name'),
+          api_key: configService.get('cloudinary.api_key'),
+          api_secret: configService.get('cloudinary.api_secret'),
+        });
+        // 🔹 Storage config
+        const storage = new CloudinaryStorage({
+          cloudinary: cloudinary,
+          params: (_req, file) => {
+            return {
+              folder: 'tribalingual_thumbnail_uploads',
+              public_id: file.originalname.split('.')[0],
+              resource_type: 'auto',
+            };
+          },
+        });
+        return { storage };
+      },
     }),
   ],
   controllers: [FileController],
