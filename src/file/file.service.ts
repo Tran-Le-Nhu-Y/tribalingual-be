@@ -4,13 +4,9 @@ import { Repository } from 'typeorm';
 import FileEntity from './entity/file.entity';
 import { FileMapper } from './file.mapper';
 import File from './interface/file.interface';
-import * as path from 'path';
 
 @Injectable()
 export class FileService {
-  private readonly saveDir =
-    process.env.LOCAL_FILE_DIR || path.join(process.cwd(), 'uploads');
-
   constructor(
     @InjectRepository(FileEntity)
     private fileRepository: Repository<FileEntity>,
@@ -31,11 +27,7 @@ export class FileService {
     if (!file) {
       throw new BadRequestException('No file uploaded');
     }
-    console.log('Cloudinary config:', {
-      cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-      api_key: process.env.CLOUDINARY_API_KEY,
-      api_secret: process.env.CLOUDINARY_API_SECRET ? '***' : 'MISSING',
-    });
+
     const fileRecord = this.fileRepository.create({
       filename: file.originalname,
       mime_type: file.mimetype,

@@ -7,13 +7,12 @@ import { FileMapper } from './file.mapper';
 import { MulterModule } from '@nestjs/platform-express';
 import { v2 as cloudinary } from 'cloudinary';
 import { CloudinaryStorage } from 'multer-storage-cloudinary';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([FileEntity]),
     MulterModule.registerAsync({
-      imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
         // 🔹 Config Cloudinary
@@ -27,7 +26,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
           cloudinary: cloudinary,
           params: (_req, file) => {
             return {
-              folder: 'tribalingual_thumbnail_uploads',
+              folder: configService.get('cloudinary.folder') as string,
               public_id: file.originalname.split('.')[0],
               resource_type: 'auto',
             };
