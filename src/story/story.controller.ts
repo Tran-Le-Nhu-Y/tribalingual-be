@@ -6,6 +6,7 @@ import {
   NotFoundException,
   Param,
   Post,
+  Put,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { StoryService } from './story.service';
@@ -16,6 +17,7 @@ import { CreateCommentBody } from './dto/create-comment.dto';
 import { CommentResponse } from './dto/comment-response.dto';
 import { CreateFavoriteBody } from './dto/create-favorite.dto';
 import { CreateViewBody } from './dto/create-view.dto';
+import { UpdateStoryBody } from './dto/update-story.dto';
 
 @ApiTags('Story')
 @Controller({ path: '/api/v1/story' })
@@ -49,6 +51,19 @@ export class StoryController {
   async createStory(@Body() body: CreateStoryBody) {
     const id = await this.service.create({ ...body });
     return id;
+  }
+
+  @Put('/update/:id')
+  @ApiOperation({ summary: 'Update a story' })
+  async updateStory(
+    @Body() body: UpdateStoryBody,
+    @Param('id') storyId: string,
+  ) {
+    const updatedStory = await this.service.update(storyId, body.userId, body);
+    if (!updatedStory) {
+      throw new NotFoundException(`Story with id ${storyId} not found`);
+    }
+    return this.mapper.toResponse(updatedStory);
   }
 
   @Delete('/delete/:id')

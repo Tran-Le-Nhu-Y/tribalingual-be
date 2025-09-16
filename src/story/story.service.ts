@@ -17,6 +17,11 @@ import { CreateFavoriteBody } from './dto/create-favorite.dto';
 import { FavoriteEntity } from './entity/favorite.entity';
 import { CreateViewBody } from './dto/create-view.dto';
 import { ViewEntity } from './entity/view.entity';
+import { UpdateStoryBody } from './dto/update-story.dto';
+import {
+  StoryAction,
+  StoryHistoryEntity,
+} from 'src/story-history/entity/story-history.entity';
 
 @Injectable()
 export class StoryService {
@@ -37,6 +42,9 @@ export class StoryService {
 
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
+
+    @InjectRepository(StoryHistoryEntity)
+    private readonly storyHistoryRepository: Repository<StoryHistoryEntity>,
   ) {}
 
   async findAll(): Promise<Story[]> {
@@ -58,15 +66,35 @@ export class StoryService {
     return savedEntity.id;
   }
 
-  async update(id: string, data: Partial<Story>): Promise<Story | null> {
-    const entity = await this.storyRepository.findOneBy({ id });
-    if (!entity) {
-      throw new NotFoundException(`Story with id ${id} not found`);
+  async update(
+    storyId: string,
+    userId: string,
+    data: UpdateStoryBody,
+  ): Promise<StoryEntity | null> {
+    const story = await this.storyRepository.findOneBy({ id: storyId });
+    if (!story) {
+      throw new NotFoundException(`Story with id ${storyId} not found`);
     }
-    const updatedEntity = this.storyRepository.merge(entity, data);
-    const savedEntity = await this.storyRepository.save(updatedEntity);
 
-    return this.storyMapper.toModel(savedEntity);
+    const user = await this.userRepository.findOneBy({ id: userId });
+    if (!user) {
+      throw new NotFoundException(`User with id ${userId} not found`);
+    }
+
+    Object.assign(story, data);
+
+    const updatedStory = await this.storyRepository.save(story);
+
+    //create story history
+    const history = this.storyHistoryRepository.create({
+      story: updatedStory,
+      user,
+      action: StoryAction.UPDATED,
+      createdAt: new Date(),
+    });
+    await this.storyHistoryRepository.save(history);
+
+    return updatedStory;
   }
 
   async remove(id: string): Promise<boolean> {

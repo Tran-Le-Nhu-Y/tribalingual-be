@@ -9,6 +9,7 @@ import { UserEntity } from 'src/user/entity/user.entity';
 import { ViewEntity } from './entity/view.entity';
 import { FavoriteEntity } from './entity/favorite.entity';
 import { CommentMapper } from './mapper/comment.mapper';
+import { StoryHistoryEntity } from 'src/story-history/entity/story-history.entity';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { CommentMapper } from './mapper/comment.mapper';
       ViewEntity,
       FavoriteEntity,
       StoryEntity,
+      StoryHistoryEntity,
     ]),
   ],
   controllers: [StoryController],

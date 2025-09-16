@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { GenreModule } from './genre/genre.module';
 import { FileModule } from './file/file.module';
 import { StoryModule } from './story/story.module';
+import { StoryHistoryModule } from './story-history/story-history.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { StoryModule } from './story/story.module';
     GenreModule,
     FileModule,
     StoryModule,
+    StoryHistoryModule,
   ],
 })
 export class AppModule {}

@@ -2,7 +2,14 @@ import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 import { CommentEntity } from './comment.entity';
 import { ViewEntity } from './view.entity';
 import { FavoriteEntity } from './favorite.entity';
+import { StoryHistoryEntity } from 'src/story-history/entity/story-history.entity';
 
+export enum StoryStatus {
+  PENDING = 'PENDING',
+  PUBLISHED = 'PUBLISHED',
+  REJECTED = 'REJECTED',
+  HIDDEN = 'HIDDEN',
+}
 @Entity()
 export default class StoryEntity {
   @PrimaryGeneratedColumn('uuid')
@@ -34,4 +41,7 @@ export default class StoryEntity {
 
   @OneToMany(() => FavoriteEntity, (favorite) => favorite.story)
   favorites: FavoriteEntity[];
+
+  @OneToMany(() => StoryHistoryEntity, (history) => history.story)
+  histories: StoryHistoryEntity[];
 }

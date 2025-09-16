@@ -1,3 +1,4 @@
+import { StoryHistoryEntity } from 'src/story-history/entity/story-history.entity';
 import { CommentEntity } from 'src/story/entity/comment.entity';
 import { FavoriteEntity } from 'src/story/entity/favorite.entity';
 import { ViewEntity } from 'src/story/entity/view.entity';
@@ -19,4 +20,7 @@ export class UserEntity {
 
   @OneToMany(() => FavoriteEntity, (favorite) => favorite.user)
   favorites: FavoriteEntity[];
+
+  @OneToMany(() => StoryHistoryEntity, (history) => history.user)
+  histories: StoryHistoryEntity[];
 }
