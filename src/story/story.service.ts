@@ -97,8 +97,32 @@ export class StoryService {
     return updatedStory;
   }
 
-  async remove(id: string): Promise<boolean> {
-    const result = await this.storyRepository.delete(id);
+  async remove(storyId: string, userId: string): Promise<boolean> {
+    const story = await this.storyRepository.findOneBy({
+      id: storyId,
+    });
+    if (!story) {
+      throw new NotFoundException(`Story with id ${storyId} not found`);
+    }
+
+    const user = await this.userRepository.findOneBy({ id: userId });
+    if (!user) {
+      throw new NotFoundException(`User with id ${userId} not found`);
+    }
+
+    //create story history snapshot before deletion
+    const history = this.storyHistoryRepository.create({
+      storyId: storyId,
+      userId: userId,
+      action: StoryAction.DELETED,
+      storyTitle: story.title,
+      storyAuthorId: story.authorId,
+      storyPublishedDate: story.publishedDate,
+      createdAt: new Date(),
+    });
+    await this.storyHistoryRepository.save(history);
+
+    const result = await this.storyRepository.delete(storyId);
     return result.affected !== 0; // true if a row was deleted, false otherwise
   }
 

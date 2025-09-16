@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsUUID } from 'class-validator';
+import { IsEnum, IsOptional, IsString, IsUUID } from 'class-validator';
 import { StoryAction } from '../entity/story-history.entity';
 
 export class CreateStoryHistoryBody {
@@ -27,4 +27,29 @@ export class CreateStoryHistoryBody {
     required: false,
   })
   createdAt?: Date;
+
+  // optional snapshot fields
+  @IsOptional()
+  @IsString()
+  @ApiProperty({
+    description: 'Snapshot title of story at the time of action',
+    required: false,
+  })
+  storyTitle?: string;
+
+  @IsOptional()
+  @IsUUID()
+  @ApiProperty({
+    description: 'Snapshot author id of story at the time of action',
+    required: false,
+  })
+  storyAuthorId?: string;
+
+  @IsOptional()
+  @ApiProperty({
+    description: 'Snapshot published date of story at the time of action',
+    required: false,
+    type: Date,
+  })
+  storyPublishedDate?: Date;
 }

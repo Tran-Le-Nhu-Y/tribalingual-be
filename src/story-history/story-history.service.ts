@@ -60,25 +60,23 @@ export class StoryHistoryService {
       user: user,
       action: data.action,
       createdAt: data.createdAt ?? new Date(),
+      storyTitle: story.title,
+      storyAuthorId: story.authorId,
+      storyPublishedDate: story.publishedDate,
     });
     const savedHistory = await this.storyHistoryRepository.save(history);
 
     return savedHistory.id;
   }
 
-  //   async update(id: string, data: Partial<Genre>): Promise<Genre | null> {
-  //     const entity = await this.storyHistoryRepository.findOneBy({ id });
-  //     if (!entity) {
-  //       throw new NotFoundException(`Genre with id ${id} not found`);
-  //     }
-  //     const updatedEntity = this.storyHistoryRepository.merge(entity, data);
-  //     const savedEntity = await this.storyHistoryRepository.save(updatedEntity);
-
-  //     return this.mapper.toModel(savedEntity);
-  //   }
-
-  //   async remove(id: string): Promise<boolean> {
-  //     const result = await this.storyHistoryRepository.delete(id);
-  //     return result.affected !== 0; // true if a row was deleted, false otherwise
-  //   }
+  async remove(id: string): Promise<boolean> {
+    const history = await this.storyHistoryRepository.findOneBy({
+      id,
+    });
+    if (!history) {
+      throw new NotFoundException(`Story history with id ${id} not found`);
+    }
+    const result = await this.storyHistoryRepository.delete(id);
+    return result.affected !== 0; // true if a row was deleted, false otherwise
+  }
 }

@@ -7,6 +7,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { StoryService } from './story.service';
@@ -68,13 +69,29 @@ export class StoryController {
 
   @Delete('/delete/:id')
   @ApiOperation({ summary: 'Delete a story by id' })
-  async deleteStory(@Param('storyId') id: string) {
-    const deleted = await this.service.remove(id);
+  async deleteStory(
+    @Param('id') storyId: string,
+    @Query('userId') userId: string,
+  ) {
+    const deleted = await this.service.remove(storyId, userId);
     if (!deleted) {
-      throw new NotFoundException(`Story with id ${id} not found`);
+      throw new NotFoundException(`Story with id ${storyId} not found`);
     }
-    return { message: `Story with id ${id} deleted successfully` };
+    return { message: `Story with id ${storyId} deleted successfully` };
   }
+
+  //   @Delete('/delete/:id')
+  //   @ApiOperation({ summary: 'Delete a story by id' })
+  //   async deleteStory(@Param('id') storyId: string, @Req() req) {
+  //     const userId = req.user.id; // lấy từ JWT guard
+  //     const deleted = await this.service.remove(storyId, userId);
+
+  //     if (!deleted) {
+  //       throw new NotFoundException(`Story with id ${storyId} not found`);
+  //     }
+
+  //     return { message: `Story with id ${storyId} deleted successfully` };
+  //   }
 
   // Comment methods
   @Post(':id/comment/create')

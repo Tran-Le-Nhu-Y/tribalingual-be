@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   NotFoundException,
   Param,
@@ -31,7 +32,7 @@ export class StoryHistoryController {
   @Get('/:id')
   @ApiOperation({ summary: 'Get story history by id' })
   @ApiResponse({ type: StoryHistoryResponse })
-  async getStoryById(@Param('id') id: string) {
+  async getHistoryById(@Param('id') id: string) {
     const history = await this.service.findOne(id);
     if (!history) {
       throw new NotFoundException(`Story history  with id ${id} not found`);
@@ -41,8 +42,18 @@ export class StoryHistoryController {
 
   @Post('/create')
   @ApiOperation({ summary: 'Create a new story history record' })
-  async createStory(@Body() body: CreateStoryHistoryBody) {
+  async createHistory(@Body() body: CreateStoryHistoryBody) {
     const id = await this.service.create({ ...body });
     return id;
+  }
+
+  @Delete('/delete/:id')
+  @ApiOperation({ summary: 'Delete a story history by id' })
+  async deleteHistory(@Param('id') id: string) {
+    const deleted = await this.service.remove(id);
+    if (!deleted) {
+      throw new NotFoundException(`Story with history id ${id} not found`);
+    }
+    return { message: `Story history with id ${id} deleted successfully` };
   }
 }

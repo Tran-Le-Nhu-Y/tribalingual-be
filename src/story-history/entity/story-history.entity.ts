@@ -37,14 +37,24 @@ export class StoryHistoryEntity {
   createdAt: Date;
 
   @ManyToOne(() => StoryEntity, (story) => story.histories, {
-    onDelete: 'CASCADE',
+    createForeignKeyConstraints: false,
   })
   @JoinColumn({ name: 'storyId' })
   story: StoryEntity;
 
   @ManyToOne(() => UserEntity, (user) => user.histories, {
-    onDelete: 'CASCADE',
+    createForeignKeyConstraints: false,
   })
   @JoinColumn({ name: 'userId' })
   user: UserEntity;
+
+  // Snapshot story data
+  @Column({ type: 'text', nullable: true })
+  storyTitle: string;
+
+  @Column({ type: 'uuid', nullable: true })
+  storyAuthorId: string;
+
+  @Column({ type: 'timestamp', nullable: true })
+  storyPublishedDate: Date;
 }
