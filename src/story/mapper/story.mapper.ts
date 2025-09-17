@@ -5,21 +5,35 @@ import StoryResponse from '../dto/story-response.dto';
 
 @Injectable()
 export class StoryMapper {
+  //Entity -> Model
   toModel(entity: StoryEntity) {
     return {
       id: entity.id,
-      title: entity.title,
       authorId: entity.authorId,
+      adminId: entity.adminId,
+      title: entity.title,
+      description: entity.description,
+      language: entity.language,
+      hmongContent: entity.hmongContent,
+      englishContent: entity.englishContent,
+      vietnameseContent: entity.vietnameseContent,
+      status: entity.status,
+      uploadedDate: entity.uploadedDate,
       publishedDate: entity.publishedDate,
+      lastUpdatedDate: entity.lastUpdatedDate,
       viewCount: entity.viewCount,
       commentCount: entity.commentCount,
       favoriteCount: entity.favoriteCount,
     } as Story;
   }
 
+  //Model -> DTO
   toResponse(model: Story) {
     return {
       ...model,
+      hmongContent: model.hmongContent ?? '',
+      englishContent: model.englishContent ?? '',
+      vietnameseContent: model.vietnameseContent ?? '',
     } as StoryResponse;
   }
 }

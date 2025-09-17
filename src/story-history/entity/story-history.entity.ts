@@ -10,11 +10,11 @@ import StoryEntity from '../../story/entity/story.entity';
 import { UserEntity } from 'src/user/entity/user.entity';
 
 export enum StoryAction {
-  CREATED = 'created',
-  UPDATED = 'updated',
-  PUBLISHED = 'published',
-  REJECTED = 'rejected',
-  DELETED = 'deleted',
+  CREATED = 'CREATED',
+  UPDATED = 'UPDATED',
+  PUBLISHED = 'PUBLISHED',
+  REJECTED = 'REJECTED',
+  DELETED = 'DELETED',
 }
 
 @Entity()

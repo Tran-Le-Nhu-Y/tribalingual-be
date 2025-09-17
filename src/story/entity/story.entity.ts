@@ -9,20 +9,54 @@ export enum StoryStatus {
   PUBLISHED = 'PUBLISHED',
   REJECTED = 'REJECTED',
   HIDDEN = 'HIDDEN',
+  UPDATED = 'UPDATED',
+}
+
+export enum Language {
+  HMONG = 'HMONG',
+  ENGLISH = 'ENGLISH',
+  VIETNAMESE = 'VIETNAMESE',
 }
 @Entity()
 export default class StoryEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'text' })
-  title: string;
-
   @Column({ type: 'uuid' })
   authorId: string;
 
-  @Column({ type: 'timestamp' })
+  @Column({ type: 'uuid', default: null })
+  adminId: string;
+
+  @Column({ type: 'text' })
+  title: string;
+
+  @Column({ type: 'text' })
+  description: string;
+
+  @Column({ type: 'enum', enum: Language, default: Language.VIETNAMESE })
+  language: Language;
+
+  @Column({ type: 'text', nullable: true })
+  hmongContent?: string;
+
+  @Column({ type: 'text', nullable: true })
+  englishContent?: string;
+
+  @Column({ type: 'text', nullable: true })
+  vietnameseContent?: string;
+
+  @Column({ type: 'enum', enum: StoryStatus, default: StoryStatus.PENDING })
+  status: StoryStatus;
+
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  uploadedDate: Date;
+
+  @Column({ type: 'timestamp', nullable: true })
   publishedDate: Date;
+
+  @Column({ type: 'timestamp', nullable: true })
+  lastUpdatedDate: Date;
 
   @Column({ default: 0 })
   viewCount: number;

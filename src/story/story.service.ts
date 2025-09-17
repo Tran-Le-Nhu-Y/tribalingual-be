@@ -2,12 +2,13 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   ConflictException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { StoryMapper } from './mapper/story.mapper';
 import Story from './interface/story.interface';
-import StoryEntity from './entity/story.entity';
+import StoryEntity, { StoryStatus } from './entity/story.entity';
 import { CommentEntity } from './entity/comment.entity';
 import { CreateCommentBody } from './dto/create-comment.dto';
 import { UserEntity } from 'src/user/entity/user.entity';
@@ -22,6 +23,7 @@ import {
   StoryAction,
   StoryHistoryEntity,
 } from 'src/story-history/entity/story-history.entity';
+import { CreateStoryBody } from './dto/create-story.dto';
 
 @Injectable()
 export class StoryService {
@@ -60,15 +62,38 @@ export class StoryService {
     return entity !== null ? this.storyMapper.toModel(entity) : null;
   }
 
-  async create(data: Partial<Story>): Promise<string> {
-    const entity = this.storyRepository.create(data);
-    const savedEntity = await this.storyRepository.save(entity);
-    return savedEntity.id;
+  async create(data: CreateStoryBody): Promise<string> {
+    const author = await this.userRepository.findOneBy({
+      id: data.authorId,
+    });
+    if (!author) {
+      throw new NotFoundException(`Author with id ${data.authorId} not found`);
+    }
+
+    const story = this.storyRepository.create({
+      ...data,
+      uploadedDate: new Date(),
+      lastUpdatedDate: new Date(),
+    });
+    const savedStory = await this.storyRepository.save(story);
+
+    //Create history record: CREATED
+    const history = this.storyHistoryRepository.create({
+      storyId: savedStory.id,
+      userId: savedStory.authorId,
+      action: StoryAction.CREATED,
+      storyTitle: savedStory.title,
+      storyAuthorId: savedStory.authorId,
+      storyPublishedDate: savedStory.publishedDate,
+      createdAt: new Date(),
+    });
+    await this.storyHistoryRepository.save(history);
+
+    return savedStory.id;
   }
 
   async update(
     storyId: string,
-    userId: string,
     data: UpdateStoryBody,
   ): Promise<StoryEntity | null> {
     const story = await this.storyRepository.findOneBy({ id: storyId });
@@ -76,25 +101,78 @@ export class StoryService {
       throw new NotFoundException(`Story with id ${storyId} not found`);
     }
 
-    const user = await this.userRepository.findOneBy({ id: userId });
+    const user = await this.userRepository.findOneBy({ id: data.userId });
     if (!user) {
-      throw new NotFoundException(`User with id ${userId} not found`);
+      throw new NotFoundException(`User with id ${data.userId} not found`);
+    }
+
+    // If story was published, only admin can update story
+    if (story.status === StoryStatus.PUBLISHED) {
+      if (!story.adminId || story.adminId !== data.userId) {
+        throw new ForbiddenException(
+          'You are not allowed to update a published story',
+        );
+      }
+    } else {
+      // If story was not published, author and admin can update story
+      if (story.authorId !== data.userId && story.adminId !== data.userId) {
+        throw new ForbiddenException(
+          'Only the author or an admin can update this story before publish',
+        );
+      }
     }
 
     Object.assign(story, data);
+    story.lastUpdatedDate = new Date();
 
     const updatedStory = await this.storyRepository.save(story);
 
-    //create story history
+    //Create history record: UPDATED
     const history = this.storyHistoryRepository.create({
-      story: updatedStory,
-      user,
+      storyId: storyId,
+      userId: data.userId,
       action: StoryAction.UPDATED,
+      storyTitle: updatedStory.title,
+      storyAuthorId: updatedStory.authorId,
+      storyPublishedDate: updatedStory.publishedDate,
       createdAt: new Date(),
     });
     await this.storyHistoryRepository.save(history);
 
     return updatedStory;
+  }
+
+  async publish(storyId: string, adminId: string): Promise<StoryEntity> {
+    const story = await this.storyRepository.findOne({
+      where: { id: storyId },
+    });
+    if (!story) {
+      throw new NotFoundException(`Story with id ${storyId} not found`);
+    }
+
+    const admin = await this.userRepository.findOneBy({ id: adminId });
+    if (!admin) {
+      throw new NotFoundException(`Admin with id ${adminId} not found`);
+    }
+
+    story.adminId = adminId;
+    story.status = StoryStatus.PUBLISHED;
+    story.publishedDate = new Date();
+    story.lastUpdatedDate = new Date();
+
+    //Create history record: PUBLISHED
+    const history = this.storyHistoryRepository.create({
+      storyId: storyId,
+      userId: adminId,
+      action: StoryAction.PUBLISHED,
+      storyTitle: story.title,
+      storyAuthorId: story.authorId,
+      storyPublishedDate: story.publishedDate,
+      createdAt: new Date(),
+    });
+    await this.storyHistoryRepository.save(history);
+
+    return await this.storyRepository.save(story);
   }
 
   async remove(storyId: string, userId: string): Promise<boolean> {
@@ -110,7 +188,7 @@ export class StoryService {
       throw new NotFoundException(`User with id ${userId} not found`);
     }
 
-    //create story history snapshot before deletion
+    //Create history record: DELETED
     const history = this.storyHistoryRepository.create({
       storyId: storyId,
       userId: userId,

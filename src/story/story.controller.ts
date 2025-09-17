@@ -60,11 +60,25 @@ export class StoryController {
     @Body() body: UpdateStoryBody,
     @Param('id') storyId: string,
   ) {
-    const updatedStory = await this.service.update(storyId, body.userId, body);
+    const updatedStory = await this.service.update(storyId, body);
     if (!updatedStory) {
       throw new NotFoundException(`Story with id ${storyId} not found`);
     }
     return this.mapper.toResponse(updatedStory);
+  }
+
+  @Put('/:id/publish')
+  @ApiOperation({ summary: 'Publish a story (admin only)' })
+  @ApiResponse({ type: StoryResponse })
+  async publishStory(
+    @Param('id') storyId: string,
+    @Query('adminId') adminId: string,
+  ) {
+    const story = await this.service.publish(storyId, adminId);
+    if (!story) {
+      throw new NotFoundException(`Story with id ${storyId} not found`);
+    }
+    return this.mapper.toResponse(story);
   }
 
   @Delete('/delete/:id')
@@ -104,9 +118,7 @@ export class StoryController {
   @Get(':id/comments/all')
   @ApiResponse({ type: [CommentResponse] })
   @ApiOperation({ summary: 'Get all comments for a story' })
-  async getComments(
-    @Param('storyId') storyId: string,
-  ): Promise<CommentResponse[]> {
+  async getComments(@Param('id') storyId: string): Promise<CommentResponse[]> {
     return this.service.findAllComments(storyId);
   }
 
