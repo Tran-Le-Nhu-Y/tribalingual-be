@@ -14,10 +14,13 @@ import { FileMapper } from './file.mapper';
 import {
   ApiBody,
   ApiConsumes,
+  ApiCreatedResponse,
   ApiInternalServerErrorResponse,
+  ApiOkResponse,
   ApiOperation,
 } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
+import FileResponse from './dto/file-response.dto';
 
 @Controller({ path: '/api/v1/file' })
 export class FileController {
@@ -43,22 +46,23 @@ export class FileController {
     return this.mapper.toResponse(file);
   }
 
-  @Get('/:id/show')
-  @ApiOperation({ summary: 'Show image by id' })
-  async showFile(@Param('id') id: string) {
-    const file = await this.service.findOne(id);
-    if (!file) {
-      throw new NotFoundException(`File with id ${id} not found`);
-    }
+  //   @Get('/:id/show')
+  //   @ApiOperation({ summary: 'Show image by id' })
+  //   async showFile(@Param('id') id: string) {
+  //     const file = await this.service.findOne(id);
+  //     if (!file) {
+  //       throw new NotFoundException(`File with id ${id} not found`);
+  //     }
 
-    // Cloudinary save url (https://res.cloudinary.com/xxx/image/upload/abc.jpg)
-    return { url: file.url };
-  }
+  //     // Cloudinary save url (https://res.cloudinary.com/xxx/image/upload/abc.jpg)
+  //     return { url: file.url };
+  //   }
 
   @Post('/upload')
   @ApiOperation({ summary: 'Upload a file (single file), return id' })
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('file'))
+  @ApiCreatedResponse({ type: FileResponse })
   @ApiBody({
     schema: {
       type: 'object',
@@ -86,6 +90,13 @@ export class FileController {
 
   @Delete('/delete/:id')
   @ApiOperation({ summary: 'Delete a file by id' })
+  @ApiOkResponse({
+    schema: {
+      example: {
+        message: 'File with id ${id} deleted successfully',
+      },
+    },
+  })
   async deleteFile(@Param('id') id: string) {
     const deleted = await this.service.remove(id);
     if (!deleted) {

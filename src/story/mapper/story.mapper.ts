@@ -11,6 +11,8 @@ export class StoryMapper {
       id: entity.id,
       authorId: entity.authorId,
       adminId: entity.adminId,
+      genreId: entity.genreId,
+      fileId: entity.fileId,
       title: entity.title,
       description: entity.description,
       language: entity.language,
@@ -34,6 +36,7 @@ export class StoryMapper {
       hmongContent: model.hmongContent ?? '',
       englishContent: model.englishContent ?? '',
       vietnameseContent: model.vietnameseContent ?? '',
+      fileUrl: model.file?.url ?? undefined,
     } as StoryResponse;
   }
 }

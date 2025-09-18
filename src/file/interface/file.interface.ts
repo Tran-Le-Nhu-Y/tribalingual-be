@@ -4,5 +4,6 @@ export default interface File {
   mime_type: string;
   size: number;
   url: string;
-  publicId: string;
+  save_path: string;
+  storyId: string;
 }

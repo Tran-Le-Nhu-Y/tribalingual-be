@@ -24,6 +24,7 @@ import {
   StoryHistoryEntity,
 } from 'src/story-history/entity/story-history.entity';
 import { CreateStoryBody } from './dto/create-story.dto';
+import GenreEntity from 'src/genre/entity/genre.entity';
 
 @Injectable()
 export class StoryService {
@@ -47,6 +48,9 @@ export class StoryService {
 
     @InjectRepository(StoryHistoryEntity)
     private readonly storyHistoryRepository: Repository<StoryHistoryEntity>,
+
+    @InjectRepository(GenreEntity)
+    private readonly genreRepository: Repository<GenreEntity>,
   ) {}
 
   async findAll(): Promise<Story[]> {
@@ -68,6 +72,13 @@ export class StoryService {
     });
     if (!author) {
       throw new NotFoundException(`Author with id ${data.authorId} not found`);
+    }
+
+    const genre = await this.genreRepository.findOneBy({
+      id: data.genreId,
+    });
+    if (!genre) {
+      throw new NotFoundException(`Genre with id ${data.genreId} not found`);
     }
 
     const story = this.storyRepository.create({
@@ -176,8 +187,9 @@ export class StoryService {
   }
 
   async remove(storyId: string, userId: string): Promise<boolean> {
-    const story = await this.storyRepository.findOneBy({
-      id: storyId,
+    const story = await this.storyRepository.findOne({
+      where: { id: storyId },
+      relations: ['file'],
     });
     if (!story) {
       throw new NotFoundException(`Story with id ${storyId} not found`);
@@ -200,8 +212,8 @@ export class StoryService {
     });
     await this.storyHistoryRepository.save(history);
 
-    const result = await this.storyRepository.delete(storyId);
-    return result.affected !== 0; // true if a row was deleted, false otherwise
+    const result = await this.storyRepository.remove(story);
+    return !!result; // true if a row was deleted, false otherwise
   }
 
   //Comment methods

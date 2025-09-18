@@ -9,7 +9,12 @@ import {
   Put,
   Query,
 } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiOkResponse,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { StoryService } from './story.service';
 import { StoryMapper } from './mapper/story.mapper';
 import StoryResponse from './dto/story-response.dto';
@@ -83,6 +88,13 @@ export class StoryController {
 
   @Delete('/delete/:id')
   @ApiOperation({ summary: 'Delete a story by id' })
+  @ApiOkResponse({
+    schema: {
+      example: {
+        message: 'Story with id ${id} deleted successfully',
+      },
+    },
+  })
   async deleteStory(
     @Param('id') storyId: string,
     @Query('userId') userId: string,
@@ -124,6 +136,13 @@ export class StoryController {
 
   @Delete('/comment/delete/:id')
   @ApiOperation({ summary: 'Delete a comment by comment id' })
+  @ApiOkResponse({
+    schema: {
+      example: {
+        message: 'Comment with id ${id} deleted successfully',
+      },
+    },
+  })
   async deleteComment(@Param('id') commentId: string) {
     const deleted = await this.service.removeComment(commentId);
     if (!deleted) {
@@ -135,6 +154,14 @@ export class StoryController {
   // Favorite methods
   @Post(':id/favorite/add')
   @ApiOperation({ summary: 'Add favorite for story' })
+  @ApiOkResponse({
+    schema: {
+      example: {
+        message:
+          'Story with id ${storyId} added to favorite successfully by user with id ${userId}',
+      },
+    },
+  })
   async addFavorite(@Body() favoriteData: CreateFavoriteBody) {
     const success = await this.service.addFavorite(favoriteData);
     if (!success) {
@@ -149,6 +176,14 @@ export class StoryController {
 
   @Delete(':storyId/favorite/delete/:userId')
   @ApiOperation({ summary: 'Delete a favorite by story id and user id' })
+  @ApiOkResponse({
+    schema: {
+      example: {
+        message:
+          'Favorite of story id ${storyId} and user id ${storyId} deleted successfully',
+      },
+    },
+  })
   async deleteFavorite(
     @Param('storyId') storyId: string,
     @Param('userId') userId: string,
@@ -160,13 +195,21 @@ export class StoryController {
       );
     }
     return {
-      message: `Favorite with story id ${storyId} and user id ${storyId} deleted successfully`,
+      message: `Favorite of story id ${storyId} and user id ${storyId} deleted successfully`,
     };
   }
 
   // View methods
   @Post(':id/view/add')
   @ApiOperation({ summary: 'Add view for story' })
+  @ApiOkResponse({
+    schema: {
+      example: {
+        message:
+          'Story with id ${storyId} added to view successfully by user with id ${userId}',
+      },
+    },
+  })
   async addView(@Body() viewData: CreateViewBody) {
     const success = await this.service.addView(viewData);
     if (!success) {

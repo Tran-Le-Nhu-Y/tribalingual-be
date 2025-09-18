@@ -8,8 +8,14 @@ export default class StoryResponse {
   @ApiProperty({ description: 'Author id', format: 'uuid' })
   authorId: string;
 
-  @ApiProperty({ description: 'Admin id', format: 'uuid' })
-  adminId?: string | null;
+  @ApiProperty({ description: 'Admin id', format: 'uuid', required: false })
+  adminId?: string;
+
+  @ApiProperty({ description: 'Genre id', format: 'uuid' })
+  genreId: string;
+
+  @ApiProperty({ description: 'File URL', required: false })
+  fileUrl?: string;
 
   @ApiProperty({
     description: 'Title of the story',

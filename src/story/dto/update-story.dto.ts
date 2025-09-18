@@ -11,6 +11,20 @@ export class UpdateStoryBody {
   userId: string;
 
   @IsOptional()
+  @IsUUID()
+  @ApiPropertyOptional({ description: 'Genre ID', format: 'uuid' })
+  genreId?: string;
+
+  @ApiProperty({
+    description: 'File ID associated with the story',
+    required: false,
+    format: 'uuid',
+  })
+  @IsUUID()
+  @IsOptional()
+  fileId?: string;
+
+  @IsOptional()
   @IsString()
   @ApiPropertyOptional({ description: 'Story title' })
   title?: string;

@@ -12,7 +12,7 @@ import { GenreService } from './genre.service';
 import { GenreMapper } from './genre.mapper';
 import CreateGenreBody from './dto/create-genre.dto';
 import UpdateGenreBody from './dto/update-genre.dto';
-import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiOkResponse, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import GenreResponse from './dto/genre-response.dto';
 
 @Controller({ path: '/api/v1/genre' })
@@ -59,6 +59,13 @@ export class GenreController {
 
   @Delete('/delete/:id')
   @ApiOperation({ summary: 'Delete a genre by id' })
+  @ApiOkResponse({
+    schema: {
+      example: {
+        message: 'Genre with id ${id} deleted successfully',
+      },
+    },
+  })
   async deleteGenre(@Param('id') id: string) {
     const deleted = await this.service.remove(id);
     if (!deleted) {

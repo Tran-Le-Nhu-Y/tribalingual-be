@@ -10,6 +10,8 @@ import { ViewEntity } from './entity/view.entity';
 import { FavoriteEntity } from './entity/favorite.entity';
 import { CommentMapper } from './mapper/comment.mapper';
 import { StoryHistoryEntity } from 'src/story-history/entity/story-history.entity';
+import GenreEntity from 'src/genre/entity/genre.entity';
+import { FileModule } from 'src/file/file.module';
 
 @Module({
   imports: [
@@ -20,7 +22,9 @@ import { StoryHistoryEntity } from 'src/story-history/entity/story-history.entit
       FavoriteEntity,
       StoryEntity,
       StoryHistoryEntity,
+      GenreEntity,
     ]),
+    FileModule,
   ],
   controllers: [StoryController],
   providers: [StoryService, StoryMapper, CommentMapper],

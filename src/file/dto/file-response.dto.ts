@@ -24,7 +24,7 @@ export default class FileResponse {
   })
   url: string;
   @ApiProperty({
-    description: 'File public id (for cloudinary)',
+    description: 'Save path (for cloudinary)',
   })
-  publicId: string;
+  save_path: string;
 }

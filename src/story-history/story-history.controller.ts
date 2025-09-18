@@ -7,7 +7,12 @@ import {
   Param,
   Post,
 } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiOkResponse,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { StoryHistoryService } from './story-history.service';
 import { StoryHistoryMapper } from './story-content.mapper';
 import StoryHistoryResponse from './dto/story-history-response.dto';
@@ -48,6 +53,13 @@ export class StoryHistoryController {
   }
 
   @Delete('/delete/:id')
+  @ApiOkResponse({
+    schema: {
+      example: {
+        message: 'Story history with id ${id} deleted successfully',
+      },
+    },
+  })
   @ApiOperation({ summary: 'Delete a story history by id' })
   async deleteHistory(@Param('id') id: string) {
     const deleted = await this.service.remove(id);

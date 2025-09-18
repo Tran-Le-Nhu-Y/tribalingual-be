@@ -13,6 +13,19 @@ export class CreateStoryBody {
   @IsUUID()
   authorId: string;
 
+  @ApiProperty({ description: 'Genre ID', format: 'uuid' })
+  @IsUUID()
+  genreId: string;
+
+  @ApiProperty({
+    description: 'File ID associated with the story',
+    required: false,
+    format: 'uuid',
+  })
+  @IsUUID()
+  @IsOptional()
+  fileId?: string;
+
   @ApiProperty({
     description: 'Title of the story',
     minLength: 1,

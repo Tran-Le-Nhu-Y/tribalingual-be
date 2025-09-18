@@ -8,11 +8,12 @@ export class FileMapper {
   toModel(entity: FileEntity) {
     return {
       id: entity.id,
+      storyId: entity.storyId,
       filename: entity.filename,
       mime_type: entity.mime_type,
       size: entity.size,
       url: entity.url,
-      publicId: entity.publicId,
+      save_path: entity.save_path,
     } as File;
   }
 

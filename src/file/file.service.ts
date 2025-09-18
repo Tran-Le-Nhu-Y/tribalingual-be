@@ -33,7 +33,7 @@ export class FileService {
       mime_type: file.mimetype,
       size: file.size,
       url: file.path, // Cloudinary URL
-      publicId: file.filename, // Cloudinary public_id
+      save_path: file.filename, // Cloudinary save_path
     });
     return await this.fileRepository.save(fileRecord);
   }

@@ -1,9 +1,20 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import StoryEntity from 'src/story/entity/story.entity';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  OneToOne,
+  JoinColumn,
+  PrimaryColumn,
+} from 'typeorm';
 
 @Entity()
 export default class FileEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
+
+  @PrimaryColumn('uuid')
+  storyId: string;
 
   @Column()
   filename: string;
@@ -18,5 +29,9 @@ export default class FileEntity {
   url: string;
 
   @Column()
-  publicId: string; //  cloudinary
+  save_path: string; //  cloudinary
+
+  @OneToOne(() => StoryEntity, (story) => story.file, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'storyId' })
+  story: StoryEntity;
 }

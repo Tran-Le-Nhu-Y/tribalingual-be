@@ -1,8 +1,18 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  OneToMany,
+  ManyToOne,
+  OneToOne,
+  JoinColumn,
+} from 'typeorm';
 import { CommentEntity } from './comment.entity';
 import { ViewEntity } from './view.entity';
 import { FavoriteEntity } from './favorite.entity';
 import { StoryHistoryEntity } from 'src/story-history/entity/story-history.entity';
+import GenreEntity from 'src/genre/entity/genre.entity';
+import FileEntity from 'src/file/entity/file.entity';
 
 export enum StoryStatus {
   PENDING = 'PENDING',
@@ -25,8 +35,14 @@ export default class StoryEntity {
   @Column({ type: 'uuid' })
   authorId: string;
 
-  @Column({ type: 'uuid', default: null })
-  adminId: string;
+  @Column({ type: 'uuid', nullable: true })
+  adminId?: string;
+
+  @Column({ type: 'uuid' })
+  genreId: string;
+
+  @Column({ type: 'uuid', nullable: true })
+  fileId?: string;
 
   @Column({ type: 'text' })
   title: string;
@@ -78,4 +94,16 @@ export default class StoryEntity {
 
   @OneToMany(() => StoryHistoryEntity, (history) => history.story)
   histories: StoryHistoryEntity[];
+
+  @ManyToOne(() => GenreEntity, (genre) => genre.stories)
+  @JoinColumn({ name: 'genreId' })
+  genre: GenreEntity;
+
+  @OneToOne(() => FileEntity, {
+    cascade: true,
+    onDelete: 'CASCADE',
+    nullable: true,
+  })
+  @JoinColumn({ name: 'fileId' })
+  file?: FileEntity;
 }
