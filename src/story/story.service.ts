@@ -25,6 +25,8 @@ import {
 } from 'src/story-history/entity/story-history.entity';
 import { CreateStoryBody } from './dto/create-story.dto';
 import GenreEntity from 'src/genre/entity/genre.entity';
+import FileEntity from 'src/file/entity/file.entity';
+import StoryResponse from './dto/story-response.dto';
 
 @Injectable()
 export class StoryService {
@@ -51,6 +53,9 @@ export class StoryService {
 
     @InjectRepository(GenreEntity)
     private readonly genreRepository: Repository<GenreEntity>,
+
+    @InjectRepository(FileEntity)
+    private readonly fileRepository: Repository<FileEntity>,
   ) {}
 
   async findAll(): Promise<Story[]> {
@@ -88,6 +93,16 @@ export class StoryService {
     });
     const savedStory = await this.storyRepository.save(story);
 
+    if (data.fileId) {
+      const file = await this.fileRepository.findOne({
+        where: { id: data.fileId },
+      });
+      if (file) {
+        file.story = savedStory;
+        await this.fileRepository.save(file);
+      }
+    }
+
     //Create history record: CREATED
     const history = this.storyHistoryRepository.create({
       storyId: savedStory.id,
@@ -103,11 +118,11 @@ export class StoryService {
     return savedStory.id;
   }
 
-  async update(
-    storyId: string,
-    data: UpdateStoryBody,
-  ): Promise<StoryEntity | null> {
-    const story = await this.storyRepository.findOneBy({ id: storyId });
+  async update(storyId: string, data: UpdateStoryBody): Promise<StoryResponse> {
+    const story = await this.storyRepository.findOne({
+      where: { id: storyId },
+      relations: ['file'],
+    });
     if (!story) {
       throw new NotFoundException(`Story with id ${storyId} not found`);
     }
@@ -132,6 +147,21 @@ export class StoryService {
         );
       }
     }
+    if (data.fileId) {
+      const newFile = await this.fileRepository.findOne({
+        where: { id: data.fileId },
+      });
+      if (newFile) {
+        // delete old file
+        if (story.file) {
+          await this.fileRepository.remove(story.file);
+        }
+
+        newFile.story = story;
+        await this.fileRepository.save(newFile);
+        story.file = newFile;
+      }
+    }
 
     Object.assign(story, data);
     story.lastUpdatedDate = new Date();
@@ -150,7 +180,7 @@ export class StoryService {
     });
     await this.storyHistoryRepository.save(history);
 
-    return updatedStory;
+    return this.storyMapper.toResponse(this.storyMapper.toModel(updatedStory));
   }
 
   async publish(storyId: string, adminId: string): Promise<StoryEntity> {

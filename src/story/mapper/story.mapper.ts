@@ -36,7 +36,6 @@ export class StoryMapper {
       hmongContent: model.hmongContent ?? '',
       englishContent: model.englishContent ?? '',
       vietnameseContent: model.vietnameseContent ?? '',
-      fileUrl: model.file?.url ?? undefined,
     } as StoryResponse;
   }
 }

@@ -5,7 +5,6 @@ import {
   OneToMany,
   ManyToOne,
   OneToOne,
-  JoinColumn,
 } from 'typeorm';
 import { CommentEntity } from './comment.entity';
 import { ViewEntity } from './view.entity';
@@ -96,14 +95,11 @@ export default class StoryEntity {
   histories: StoryHistoryEntity[];
 
   @ManyToOne(() => GenreEntity, (genre) => genre.stories)
-  @JoinColumn({ name: 'genreId' })
   genre: GenreEntity;
 
-  @OneToOne(() => FileEntity, {
+  @OneToOne(() => FileEntity, (file) => file.story, {
     cascade: true,
-    onDelete: 'CASCADE',
     nullable: true,
   })
-  @JoinColumn({ name: 'fileId' })
   file?: FileEntity;
 }

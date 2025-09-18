@@ -5,7 +5,11 @@ database:
   password: test
   dbname: test_db
 cloudinary:
-  folder: folder
-  cloud_name: test
-  api_key: test
-  api_secret: test
+  # folder: folder
+  # cloud_name: test
+  # api_key: test
+  # api_secret: test
+  folder: tribalingual_thumbnail_uploads
+  cloud_name: dufgvmzfc
+  api_key: 351856461444595
+  api_secret: 2hMhtH_CA-yckxPW2F0dhYhpZiI
