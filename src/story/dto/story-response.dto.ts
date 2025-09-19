@@ -14,8 +14,8 @@ export default class StoryResponse {
   @ApiProperty({ description: 'Genre id', format: 'uuid' })
   genreId: string;
 
-  @ApiProperty({ description: 'File URL', required: false })
-  fileUrl?: string;
+  @ApiProperty({ description: 'Genre id', format: 'uuid' })
+  fileId?: string;
 
   @ApiProperty({
     description: 'Title of the story',

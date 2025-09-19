@@ -1,4 +1,3 @@
-import FileEntity from 'src/file/entity/file.entity';
 import { StoryStatus } from '../entity/story.entity';
 
 export default interface Story {
@@ -7,7 +6,6 @@ export default interface Story {
   adminId?: string | null;
   genreId: string;
   fileId?: string | null;
-  file?: FileEntity;
 
   title: string;
   description: string;

@@ -1,11 +1,11 @@
+import { Exclude } from 'class-transformer';
 import StoryEntity from 'src/story/entity/story.entity';
 import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
-  OneToOne,
   JoinColumn,
-  PrimaryColumn,
+  OneToOne,
 } from 'typeorm';
 
 @Entity()
@@ -13,8 +13,8 @@ export default class FileEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @PrimaryColumn('uuid')
-  storyId: string;
+  @Column({ type: 'uuid', nullable: true })
+  storyId?: string;
 
   @Column()
   filename: string;
@@ -31,7 +31,9 @@ export default class FileEntity {
   @Column()
   save_path: string; //  cloudinary
 
+  // File là owner, có FK storyId
   @OneToOne(() => StoryEntity, (story) => story.file, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'storyId' })
-  story: StoryEntity;
+  @Exclude()
+  story?: StoryEntity;
 }

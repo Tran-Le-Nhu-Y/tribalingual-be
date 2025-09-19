@@ -6,6 +6,11 @@ export default class FileResponse {
   })
   id: string;
   @ApiProperty({
+    description: 'Story id',
+    format: 'uuid',
+  })
+  storyId: string;
+  @ApiProperty({
     description: 'File name',
     minLength: 1,
     maxLength: 100,

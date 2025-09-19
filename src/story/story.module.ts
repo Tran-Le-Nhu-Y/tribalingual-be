@@ -11,7 +11,7 @@ import { FavoriteEntity } from './entity/favorite.entity';
 import { CommentMapper } from './mapper/comment.mapper';
 import { StoryHistoryEntity } from 'src/story-history/entity/story-history.entity';
 import GenreEntity from 'src/genre/entity/genre.entity';
-import { FileModule } from 'src/file/file.module';
+import FileEntity from 'src/file/entity/file.entity';
 
 @Module({
   imports: [
@@ -23,8 +23,8 @@ import { FileModule } from 'src/file/file.module';
       StoryEntity,
       StoryHistoryEntity,
       GenreEntity,
+      FileEntity,
     ]),
-    FileModule,
   ],
   controllers: [StoryController],
   providers: [StoryService, StoryMapper, CommentMapper],
