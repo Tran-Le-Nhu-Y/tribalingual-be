@@ -27,6 +27,7 @@ import { CreateStoryBody } from './dto/create-story.dto';
 import GenreEntity from 'src/genre/entity/genre.entity';
 import FileEntity from 'src/file/entity/file.entity';
 import StoryResponse from './dto/story-response.dto';
+import { v2 as cloudinary } from 'cloudinary';
 
 @Injectable()
 export class StoryService {
@@ -155,6 +156,7 @@ export class StoryService {
         // delete old file
         if (story.file) {
           await this.fileRepository.remove(story.file);
+          await cloudinary.uploader.destroy(story.file.save_path);
         }
 
         newFile.story = story;
@@ -242,8 +244,23 @@ export class StoryService {
     });
     await this.storyHistoryRepository.save(history);
 
-    const result = await this.storyRepository.remove(story);
-    return !!result; // true if a row was deleted, false otherwise
+    try {
+      // Delete file in cloud
+      if (story.file?.save_path) {
+        await cloudinary.uploader.destroy(story.file.save_path);
+      }
+      // Delete file record in DB
+      if (story.file) {
+        await this.fileRepository.remove(story.file);
+      }
+
+      //Delete story in DB
+      await this.storyRepository.remove(story);
+      return true;
+    } catch (error) {
+      console.error('Error removing story and file:', error);
+      throw new Error('Cannot remove story');
+    }
   }
 
   //Comment methods
