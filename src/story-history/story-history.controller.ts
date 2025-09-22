@@ -52,7 +52,7 @@ export class StoryHistoryController {
     return id;
   }
 
-  @Delete('/delete/:id')
+  @Delete('/:id/delete')
   @ApiOkResponse({
     schema: {
       example: {

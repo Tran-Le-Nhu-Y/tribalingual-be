@@ -14,6 +14,17 @@ export class GenreService {
     private readonly mapper: GenreMapper,
   ) {}
 
+  async findAllWithPaging(
+    offset: number,
+    limit: number,
+  ): Promise<[Genre[], number]> {
+    return this.genreRepository.findAndCount({
+      skip: offset,
+      take: limit,
+      order: { name: 'ASC' }, // có thể sắp xếp theo tên
+    });
+  }
+
   async findAll(): Promise<Genre[]> {
     const entities = await this.genreRepository.find();
     return entities.map((entity) => this.mapper.toModel(entity));

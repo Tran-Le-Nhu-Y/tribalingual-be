@@ -7,13 +7,20 @@ import {
   Param,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import { GenreService } from './genre.service';
 import { GenreMapper } from './genre.mapper';
 import CreateGenreBody from './dto/create-genre.dto';
 import UpdateGenreBody from './dto/update-genre.dto';
-import { ApiOkResponse, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiOkResponse,
+  ApiOperation,
+  ApiQuery,
+  ApiResponse,
+} from '@nestjs/swagger';
 import GenreResponse from './dto/genre-response.dto';
+import { PagingWrapper } from './dto/paging-wrapper.dto';
 
 @Controller({ path: '/api/v1/genre' })
 export class GenreController {
@@ -24,10 +31,25 @@ export class GenreController {
 
   @Get('/all')
   @ApiOperation({ summary: 'Get all genres' })
-  @ApiResponse({ type: [GenreResponse] })
-  async getAllGenres() {
-    const genres = await this.service.findAll();
-    return genres.map((model) => this.mapper.toResponse(model));
+  @ApiResponse({ type: PagingWrapper })
+  @ApiQuery({ name: 'offset', type: Number, required: false, example: 0 })
+  @ApiQuery({ name: 'limit', type: Number, required: false, example: 20 })
+  async getAllGenres(
+    @Query('offset') offset = 0,
+    @Query('limit') limit = 20,
+  ): Promise<PagingWrapper<GenreResponse>> {
+    const [entities, total] = await this.service.findAllWithPaging(
+      offset,
+      limit,
+    );
+    const content = entities.map((model) => this.mapper.toResponse(model));
+    return {
+      content,
+      page_number: Math.floor(offset / limit),
+      page_size: limit,
+      total_elements: total,
+      total_pages: Math.ceil(total / limit),
+    };
   }
 
   @Get('/genre/:id')
@@ -47,7 +69,7 @@ export class GenreController {
     return id;
   }
 
-  @Put('/update/:id')
+  @Put('/:id/update')
   @ApiOperation({ summary: 'Update a genre' })
   async updateGenre(@Param('id') id: string, @Body() body: UpdateGenreBody) {
     const updatedGenre = await this.service.update(id, body);
@@ -57,7 +79,7 @@ export class GenreController {
     return this.mapper.toResponse(updatedGenre);
   }
 
-  @Delete('/delete/:id')
+  @Delete('/:id/delete')
   @ApiOperation({ summary: 'Delete a genre by id' })
   @ApiOkResponse({
     schema: {

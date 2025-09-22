@@ -88,7 +88,7 @@ export class FileController {
     return savedFile;
   }
 
-  @Delete('/delete/:id')
+  @Delete('/:id/delete')
   @ApiOperation({ summary: 'Delete a file by id' })
   @ApiOkResponse({
     schema: {

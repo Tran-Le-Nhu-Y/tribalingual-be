@@ -59,7 +59,7 @@ export class StoryController {
     return id;
   }
 
-  @Put('/update/:id')
+  @Put('/:id/update')
   @ApiOperation({ summary: 'Update a story' })
   async updateStory(
     @Body() body: UpdateStoryBody,
@@ -86,7 +86,7 @@ export class StoryController {
     return this.mapper.toResponse(story);
   }
 
-  @Delete('/delete/:id')
+  @Delete('/:id/delete')
   @ApiOperation({ summary: 'Delete a story by id' })
   @ApiOkResponse({
     schema: {
@@ -134,7 +134,7 @@ export class StoryController {
     return this.service.findAllComments(storyId);
   }
 
-  @Delete('/comment/delete/:id')
+  @Delete('/comment/:id/delete')
   @ApiOperation({ summary: 'Delete a comment by comment id' })
   @ApiOkResponse({
     schema: {
