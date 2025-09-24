@@ -17,7 +17,7 @@ export default class FileEntity {
   storyId?: string;
 
   @Column()
-  filename: string;
+  name: string;
 
   @Column()
   mime_type: string;

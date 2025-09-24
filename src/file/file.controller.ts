@@ -6,6 +6,7 @@ import {
   Param,
   ParseFilePipeBuilder,
   Post,
+  Query,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
@@ -18,9 +19,12 @@ import {
   ApiInternalServerErrorResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiQuery,
+  ApiResponse,
 } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import FileResponse from './dto/file-response.dto';
+import { PagingWrapper } from './dto/paging-wrapper.dto';
 
 @Controller({ path: '/api/v1/file' })
 export class FileController {
@@ -29,11 +33,34 @@ export class FileController {
     private readonly mapper: FileMapper,
   ) {}
 
+  //   @Get('/all')
+  //   @ApiOperation({ summary: 'Get all files metadata' })
+  //   async getAllFiles() {
+  //     const files = await this.service.findAll();
+  //     return files.map((model) => this.mapper.toResponse(model));
+  //   }
+
   @Get('/all')
   @ApiOperation({ summary: 'Get all files metadata' })
-  async getAllFiles() {
-    const files = await this.service.findAll();
-    return files.map((model) => this.mapper.toResponse(model));
+  @ApiResponse({ type: PagingWrapper })
+  @ApiQuery({ name: 'offset', type: Number, required: false, example: 0 })
+  @ApiQuery({ name: 'limit', type: Number, required: false, example: 20 })
+  async getAllFiles(
+    @Query('offset') offset = 0,
+    @Query('limit') limit = 20,
+  ): Promise<PagingWrapper<FileResponse>> {
+    const [entities, total] = await this.service.findAllWithPaging(
+      offset,
+      limit,
+    );
+    const content = entities.map((model) => this.mapper.toResponse(model));
+    return {
+      content,
+      page_number: Math.floor(offset / limit),
+      page_size: limit,
+      total_elements: total,
+      total_pages: Math.ceil(total / limit),
+    };
   }
 
   @Get('/:id')

@@ -59,6 +59,17 @@ export class StoryService {
     private readonly fileRepository: Repository<FileEntity>,
   ) {}
 
+  async findAllWithPaging(
+    offset: number,
+    limit: number,
+  ): Promise<[Story[], number]> {
+    return this.storyRepository.findAndCount({
+      skip: offset,
+      take: limit,
+      order: { publishedDate: 'ASC' }, // có thể sắp xếp theo tên
+    });
+  }
+
   async findAll(): Promise<Story[]> {
     const entities = await this.storyRepository.find();
     return entities.map((entity) => this.storyMapper.toModel(entity));

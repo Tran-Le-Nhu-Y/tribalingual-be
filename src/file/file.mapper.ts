@@ -9,7 +9,7 @@ export class FileMapper {
     return {
       id: entity.id,
       storyId: entity.storyId,
-      filename: entity.filename,
+      name: entity.name,
       mime_type: entity.mime_type,
       size: entity.size,
       url: entity.url,

@@ -12,6 +12,7 @@ import {
 import {
   ApiOkResponse,
   ApiOperation,
+  ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
@@ -24,6 +25,7 @@ import { CommentResponse } from './dto/comment-response.dto';
 import { CreateFavoriteBody } from './dto/create-favorite.dto';
 import { CreateViewBody } from './dto/create-view.dto';
 import { UpdateStoryBody } from './dto/update-story.dto';
+import { PagingWrapper } from './dto/paging-wrapper.dto';
 
 @ApiTags('Story')
 @Controller({ path: '/api/v1/story' })
@@ -33,12 +35,35 @@ export class StoryController {
     private readonly mapper: StoryMapper,
   ) {}
 
+  //   @Get('/all')
+  //   @ApiOperation({ summary: 'Get all stories' })
+  //   @ApiResponse({ type: [StoryResponse] })
+  //   async getAllStories() {
+  //     const stories = await this.service.findAll();
+  //     return stories.map((model) => this.mapper.toResponse(model));
+  //   }
+
   @Get('/all')
   @ApiOperation({ summary: 'Get all stories' })
-  @ApiResponse({ type: [StoryResponse] })
-  async getAllStories() {
-    const stories = await this.service.findAll();
-    return stories.map((model) => this.mapper.toResponse(model));
+  @ApiResponse({ type: PagingWrapper })
+  @ApiQuery({ name: 'offset', type: Number, required: false, example: 0 })
+  @ApiQuery({ name: 'limit', type: Number, required: false, example: 20 })
+  async getAllStories(
+    @Query('offset') offset = 0,
+    @Query('limit') limit = 20,
+  ): Promise<PagingWrapper<StoryResponse>> {
+    const [entities, total] = await this.service.findAllWithPaging(
+      offset,
+      limit,
+    );
+    const content = entities.map((model) => this.mapper.toResponse(model));
+    return {
+      content,
+      page_number: Math.floor(offset / limit),
+      page_size: limit,
+      total_elements: total,
+      total_pages: Math.ceil(total / limit),
+    };
   }
 
   @Get('/:id')

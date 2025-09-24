@@ -9,13 +9,13 @@ export default class FileResponse {
     description: 'Story id',
     format: 'uuid',
   })
-  storyId: string;
+  storyId?: string;
   @ApiProperty({
     description: 'File name',
     minLength: 1,
     maxLength: 100,
   })
-  filename: string;
+  name: string;
   @ApiProperty({
     description: 'File mime type',
   })

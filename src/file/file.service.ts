@@ -23,6 +23,17 @@ export class FileService {
     return entities.map((entity) => this.mapper.toModel(entity));
   }
 
+  async findAllWithPaging(
+    offset: number,
+    limit: number,
+  ): Promise<[File[], number]> {
+    return this.fileRepository.findAndCount({
+      skip: offset,
+      take: limit,
+      order: { name: 'ASC' },
+    });
+  }
+
   async findOne(id: string): Promise<File | null> {
     const entity = await this.fileRepository.findOneBy({ id });
     return entity !== null ? this.mapper.toModel(entity) : null;
@@ -34,7 +45,7 @@ export class FileService {
     }
 
     const fileRecord = this.fileRepository.create({
-      filename: file.originalname,
+      name: file.originalname,
       mime_type: file.mimetype,
       size: file.size,
       url: file.path, // Cloudinary URL
