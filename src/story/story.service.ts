@@ -66,7 +66,7 @@ export class StoryService {
     return this.storyRepository.findAndCount({
       skip: offset,
       take: limit,
-      order: { publishedDate: 'ASC' }, // có thể sắp xếp theo tên
+      order: { publishedDate: 'DESC' },
     });
   }
 
