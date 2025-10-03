@@ -69,7 +69,7 @@ export class StoryController {
   @Get('/:id')
   @ApiOperation({ summary: 'Get story by id' })
   @ApiResponse({ type: StoryResponse })
-  async getStoryById(@Param('storyId') id: string) {
+  async getStoryById(@Param('id') id: string) {
     const story = await this.service.findOne(id);
     if (!story) {
       throw new NotFoundException(`Story with id ${id} not found`);
