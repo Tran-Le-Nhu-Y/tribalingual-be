@@ -5,6 +5,7 @@ import {
   OneToMany,
   ManyToOne,
   OneToOne,
+  JoinColumn,
 } from 'typeorm';
 import { CommentEntity } from './comment.entity';
 import { ViewEntity } from './view.entity';
@@ -82,7 +83,7 @@ export default class StoryEntity {
   @Column({ default: 0 })
   favoriteCount: number;
 
-  @OneToMany(() => CommentEntity, (comment) => comment.story)
+  @OneToMany(() => CommentEntity, (comment) => comment.story, { eager: true })
   comments: CommentEntity[];
 
   @OneToMany(() => ViewEntity, (view) => view.story)
@@ -94,12 +95,14 @@ export default class StoryEntity {
   @OneToMany(() => StoryHistoryEntity, (history) => history.story)
   histories: StoryHistoryEntity[];
 
-  @ManyToOne(() => GenreEntity, (genre) => genre.stories)
+  @ManyToOne(() => GenreEntity, (genre) => genre.stories, { eager: true })
   genre: GenreEntity;
 
   @OneToOne(() => FileEntity, (file) => file.story, {
     cascade: true,
     nullable: true,
+    eager: true,
   })
-  file?: FileEntity;
+  @JoinColumn({ name: 'fileId' })
+  file?: FileEntity | null;
 }

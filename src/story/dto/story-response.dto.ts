@@ -1,5 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Language, StoryStatus } from '../entity/story.entity';
+import FileResponse from 'src/file/dto/file-response.dto';
+import GenreResponse from 'src/genre/dto/genre-response.dto';
+import { CommentResponse } from './comment-response.dto';
 
 export default class StoryResponse {
   @ApiProperty({ description: 'Story id', format: 'uuid' })
@@ -14,7 +17,7 @@ export default class StoryResponse {
   @ApiProperty({ description: 'Genre id', format: 'uuid' })
   genreId: string;
 
-  @ApiProperty({ description: 'Genre id', format: 'uuid' })
+  @ApiProperty({ description: 'File id', format: 'uuid' })
   fileId?: string;
 
   @ApiProperty({
@@ -63,4 +66,24 @@ export default class StoryResponse {
 
   @ApiProperty({ description: 'Number of likes (favorites)' })
   favoriteCount: number;
+
+  @ApiProperty({
+    description: 'File info associated with this story',
+    required: false,
+    type: () => FileResponse,
+  })
+  file?: FileResponse | null;
+
+  @ApiProperty({
+    description: 'Genre info associated with this story',
+    required: false,
+    type: () => GenreResponse,
+  })
+  genre?: GenreResponse | null;
+  @ApiProperty({
+    description: 'List of comments for this story',
+    required: false,
+    type: () => [CommentResponse],
+  })
+  comments?: CommentResponse[];
 }

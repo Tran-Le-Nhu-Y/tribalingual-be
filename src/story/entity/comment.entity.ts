@@ -1,4 +1,10 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
 import StoryEntity from './story.entity';
 import { UserEntity } from 'src/user/entity/user.entity';
 
@@ -6,6 +12,12 @@ import { UserEntity } from 'src/user/entity/user.entity';
 export class CommentEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
+
+  @Column('uuid')
+  storyId: string;
+
+  @Column('uuid')
+  userId: string;
 
   @Column({ type: 'text' })
   content: string;
@@ -16,10 +28,12 @@ export class CommentEntity {
   @ManyToOne(() => StoryEntity, (story) => story.comments, {
     onDelete: 'CASCADE',
   })
+  @JoinColumn({ name: 'storyId' })
   story: StoryEntity;
 
   @ManyToOne(() => UserEntity, (user) => user.comments, {
     onDelete: 'CASCADE',
   })
+  @JoinColumn({ name: 'userId' })
   user: UserEntity;
 }

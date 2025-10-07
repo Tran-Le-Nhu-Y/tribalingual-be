@@ -7,7 +7,6 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { StoryMapper } from './mapper/story.mapper';
-import Story from './interface/story.interface';
 import StoryEntity, { StoryStatus } from './entity/story.entity';
 import { CommentEntity } from './entity/comment.entity';
 import { CreateCommentBody } from './dto/create-comment.dto';
@@ -28,6 +27,7 @@ import GenreEntity from 'src/genre/entity/genre.entity';
 import FileEntity from 'src/file/entity/file.entity';
 import StoryResponse from './dto/story-response.dto';
 import { v2 as cloudinary } from 'cloudinary';
+import { CommentResponse } from './dto/comment-response.dto';
 
 @Injectable()
 export class StoryService {
@@ -62,7 +62,7 @@ export class StoryService {
   async findAllWithPaging(
     offset: number,
     limit: number,
-  ): Promise<[Story[], number]> {
+  ): Promise<[StoryEntity[], number]> {
     return this.storyRepository.findAndCount({
       skip: offset,
       take: limit,
@@ -74,26 +74,25 @@ export class StoryService {
     offset: number,
     limit: number,
     status: StoryStatus,
-  ): Promise<[Story[], number]> {
+  ): Promise<[StoryEntity[], number]> {
     return this.storyRepository.findAndCount({
       skip: offset,
       take: limit,
       where: { status: status },
       order: { publishedDate: 'DESC' },
+      relations: ['genre', 'file'],
     });
   }
 
-  async findAll(): Promise<Story[]> {
-    const entities = await this.storyRepository.find();
-    return entities.map((entity) => this.storyMapper.toModel(entity));
-  }
-
-  async findOne(id: string): Promise<Story | null> {
-    const entity = await this.storyRepository.findOneBy({ id });
-    if (!entity) {
+  async findOne(id: string): Promise<StoryEntity | null> {
+    const story = await this.storyRepository.findOne({
+      where: { id },
+      relations: ['genre', 'file', 'comments'],
+    });
+    if (!story) {
       throw new NotFoundException(`Story with id ${id} not found`);
     }
-    return entity !== null ? this.storyMapper.toModel(entity) : null;
+    return story;
   }
 
   async create(data: CreateStoryBody): Promise<string> {
@@ -206,7 +205,7 @@ export class StoryService {
     });
     await this.storyHistoryRepository.save(history);
 
-    return this.storyMapper.toResponse(this.storyMapper.toModel(updatedStory));
+    return this.storyMapper.toResponse(updatedStory);
   }
 
   async publish(storyId: string, adminId: string): Promise<StoryEntity> {
@@ -269,17 +268,24 @@ export class StoryService {
     await this.storyHistoryRepository.save(history);
 
     try {
-      // Delete file in cloud
-      if (story.file?.save_path) {
-        await cloudinary.uploader.destroy(story.file.save_path);
-      }
-      // Delete file record in DB
-      if (story.file) {
-        await this.fileRepository.remove(story.file);
+      // Save file before deleting story
+      const file = story.file;
+
+      // Remove the file link from the story to avoid FK errors
+      story.file = null;
+      await this.storyRepository.save(story);
+
+      // Delete story
+      await this.storyRepository.remove(story);
+
+      // Delete file in cloud and file record in DB
+      if (file) {
+        if (file.save_path) {
+          await cloudinary.uploader.destroy(file.save_path);
+        }
+        await this.fileRepository.remove(file);
       }
 
-      //Delete story in DB
-      await this.storyRepository.remove(story);
       return true;
     } catch (error) {
       console.error('Error removing story and file:', error);
@@ -289,47 +295,52 @@ export class StoryService {
 
   //Comment methods
   async addComment(commentData: CreateCommentBody): Promise<string> {
-    const story = await this.storyRepository.findOneBy({
+    const isStoryExist = await this.storyRepository.existsBy({
       id: commentData.storyId,
     });
-    if (!story) {
+    if (!isStoryExist) {
       throw new NotFoundException(
         `Story with id ${commentData.storyId} not found`,
       );
     }
-    const user = await this.userRepository.findOneBy({
+    const isUserExist = await this.userRepository.existsBy({
       id: commentData.userId,
     });
-    if (!user) {
+    if (!isUserExist) {
       throw new NotFoundException(
         `User with id ${commentData.userId} not found`,
       );
     }
-    const comment = this.commentRepository.create({
-      story: story,
-      user: user,
+
+    const savedComment = await this.commentRepository.save({
+      storyId: commentData.storyId,
+      userId: commentData.userId,
       content: commentData.content,
-      createdAt: commentData.createdAt || new Date(),
+      createdAt: new Date(),
     });
-    const savedComment = await this.commentRepository.save(comment);
 
     // Update comment count
-    story.commentCount = (story.commentCount || 0) + 1;
-    await this.storyRepository.save(story);
+    const story = await this.storyRepository.findOneBy({
+      id: commentData.storyId,
+    });
+    story!.commentCount = (story!.commentCount || 0) + 1;
+    await this.storyRepository.save(story!);
 
     return savedComment.id;
   }
 
-  async findAllComments(storyId: string): Promise<CommentEntity[]> {
+  async findAllComments(storyId: string): Promise<CommentResponse[]> {
     const story = await this.storyRepository.findOneBy({ id: storyId });
     if (!story) {
       throw new NotFoundException(`Story with id ${storyId} not found`);
     }
-    return this.commentRepository.find({
+    const comments = await this.commentRepository.find({
       where: { story: { id: storyId } },
-      relations: ['user', 'story'],
+      relations: ['story', 'user'], // join story, user
       order: { createdAt: 'DESC' },
     });
+
+    return this.commentMapper.toResponseList(comments);
   }
 
   async updateComment(
@@ -390,6 +401,7 @@ export class StoryService {
     }
 
     const existingFavorite = await this.favoriteRepository.findOne({
+      // check ko xài thì đổi thành exist
       where: {
         story: { id: favoriteData.storyId },
         user: { id: favoriteData.userId },
@@ -402,9 +414,9 @@ export class StoryService {
     }
 
     const favorite = this.favoriteRepository.create({
-      story: story,
-      user: user,
-      addedDate: favoriteData.addedDate || new Date(),
+      storyId: story.id,
+      userId: user.id,
+      addedDate: new Date(),
     });
     const savedFavorite = await this.favoriteRepository.save(favorite);
 

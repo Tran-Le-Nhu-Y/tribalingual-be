@@ -78,7 +78,7 @@ export class StoryController {
     const [entities, total] = status
       ? await this.service.findAllByStatusWithPaging(offset, limit, status)
       : await this.service.findAllWithPaging(offset, limit);
-    const content = entities.map((model) => this.mapper.toResponse(model));
+    const content = entities.map((entity) => this.mapper.toResponse(entity));
     return {
       content,
       page_number: Math.floor(offset / limit),
@@ -116,7 +116,7 @@ export class StoryController {
     if (!updatedStory) {
       throw new NotFoundException(`Story with id ${storyId} not found`);
     }
-    return this.mapper.toResponse(updatedStory);
+    return updatedStory;
   }
 
   @Put('/:id/publish')
