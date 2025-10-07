@@ -26,6 +26,7 @@ import { CreateFavoriteBody } from './dto/create-favorite.dto';
 import { CreateViewBody } from './dto/create-view.dto';
 import { UpdateStoryBody } from './dto/update-story.dto';
 import { PagingWrapper } from './dto/paging-wrapper.dto';
+import { StoryStatus } from './entity/story.entity';
 
 @ApiTags('Story')
 @Controller({ path: '/api/v1/story' })
@@ -37,25 +38,46 @@ export class StoryController {
 
   //   @Get('/all')
   //   @ApiOperation({ summary: 'Get all stories' })
-  //   @ApiResponse({ type: [StoryResponse] })
-  //   async getAllStories() {
-  //     const stories = await this.service.findAll();
-  //     return stories.map((model) => this.mapper.toResponse(model));
+  //   @ApiResponse({ type: PagingWrapper })
+  //   @ApiQuery({ name: 'offset', type: Number, required: false, example: 0 })
+  //   @ApiQuery({ name: 'limit', type: Number, required: false, example: 20 })
+  //   async getAllStories(
+  //     @Query('offset') offset = 0,
+  //     @Query('limit') limit = 20,
+  //   ): Promise<PagingWrapper<StoryResponse>> {
+  //     const [entities, total] = await this.service.findAllWithPaging(
+  //       offset,
+  //       limit,
+  //     );
+  //     const content = entities.map((model) => this.mapper.toResponse(model));
+  //     return {
+  //       content,
+  //       page_number: Math.floor(offset / limit),
+  //       page_size: limit,
+  //       total_elements: total,
+  //       total_pages: Math.ceil(total / limit),
+  //     };
   //   }
 
   @Get('/all')
-  @ApiOperation({ summary: 'Get all stories' })
+  @ApiOperation({ summary: 'Get all stories (optionally filtered by status)' })
   @ApiResponse({ type: PagingWrapper })
   @ApiQuery({ name: 'offset', type: Number, required: false, example: 0 })
   @ApiQuery({ name: 'limit', type: Number, required: false, example: 20 })
+  @ApiQuery({
+    name: 'status',
+    enum: StoryStatus,
+    required: false,
+    example: StoryStatus.PENDING,
+  })
   async getAllStories(
     @Query('offset') offset = 0,
     @Query('limit') limit = 20,
+    @Query('status') status?: StoryStatus,
   ): Promise<PagingWrapper<StoryResponse>> {
-    const [entities, total] = await this.service.findAllWithPaging(
-      offset,
-      limit,
-    );
+    const [entities, total] = status
+      ? await this.service.findAllByStatusWithPaging(offset, limit, status)
+      : await this.service.findAllWithPaging(offset, limit);
     const content = entities.map((model) => this.mapper.toResponse(model));
     return {
       content,

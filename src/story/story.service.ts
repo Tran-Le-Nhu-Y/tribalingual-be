@@ -70,6 +70,19 @@ export class StoryService {
     });
   }
 
+  async findAllByStatusWithPaging(
+    offset: number,
+    limit: number,
+    status: StoryStatus,
+  ): Promise<[Story[], number]> {
+    return this.storyRepository.findAndCount({
+      skip: offset,
+      take: limit,
+      where: { status: status },
+      order: { publishedDate: 'DESC' },
+    });
+  }
+
   async findAll(): Promise<Story[]> {
     const entities = await this.storyRepository.find();
     return entities.map((entity) => this.storyMapper.toModel(entity));
