@@ -14,10 +14,4 @@ export class CreateViewBody {
     required: true,
   })
   userId: string;
-
-  @ApiProperty({
-    description: 'Last view date',
-    required: false,
-  })
-  lastViewDate?: Date;
 }

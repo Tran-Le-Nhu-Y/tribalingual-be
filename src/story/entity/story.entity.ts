@@ -102,6 +102,7 @@ export default class StoryEntity {
     cascade: true,
     nullable: true,
     eager: true,
+    onDelete: 'SET NULL',
   })
   @JoinColumn({ name: 'fileId' })
   file?: FileEntity | null;

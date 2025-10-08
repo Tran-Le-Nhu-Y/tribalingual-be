@@ -20,10 +20,4 @@ export class CreateCommentBody {
     minLength: 1,
   })
   content: string;
-
-  @ApiProperty({
-    description: 'Date comment was created',
-    required: false,
-  })
-  createdAt?: Date;
 }

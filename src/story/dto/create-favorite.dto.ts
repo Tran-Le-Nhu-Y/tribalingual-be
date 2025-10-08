@@ -14,10 +14,4 @@ export class CreateFavoriteBody {
     required: true,
   })
   userId: string;
-
-  @ApiProperty({
-    description: 'Date comment was created',
-    required: false,
-  })
-  addedDate?: Date;
 }

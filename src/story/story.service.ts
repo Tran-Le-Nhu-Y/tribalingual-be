@@ -171,24 +171,38 @@ export class StoryService {
         );
       }
     }
-    if (data.fileId) {
+    if (data.fileId && data.fileId !== story.fileId) {
+      if (story.file) {
+        // Delete old file in cloud and old file record in DB
+        try {
+          await cloudinary.uploader.destroy(story.file.save_path);
+        } catch (e) {
+          console.warn('Failed to delete old file on Cloudinary:', e);
+        }
+        await this.fileRepository.remove(story.file);
+      }
       const newFile = await this.fileRepository.findOne({
         where: { id: data.fileId },
       });
-      if (newFile) {
-        // delete old file
-        if (story.file) {
-          await this.fileRepository.remove(story.file);
-          await cloudinary.uploader.destroy(story.file.save_path);
-        }
-
-        newFile.story = story;
-        await this.fileRepository.save(newFile);
-        story.file = newFile;
+      if (!newFile) {
+        throw new NotFoundException(`File with id ${data.fileId} not found`);
       }
+
+      newFile.storyId = story.id;
+      await this.fileRepository.save(newFile);
+      story.file = newFile;
     }
 
-    Object.assign(story, data);
+    Object.assign(story, {
+      genreId: data.genreId,
+      title: data.title,
+      description: data.description,
+      language: data.language,
+      hmongContent: data.hmongContent,
+      englishContent: data.englishContent,
+      vietnameseContent: data.vietnameseContent,
+      status: data.status,
+    });
     story.lastUpdatedDate = new Date();
 
     const updatedStory = await this.storyRepository.save(story);
@@ -268,23 +282,14 @@ export class StoryService {
     await this.storyHistoryRepository.save(history);
 
     try {
-      // Save file before deleting story
-      const file = story.file;
-
-      // Remove the file link from the story to avoid FK errors
-      story.file = null;
-      await this.storyRepository.save(story);
-
       // Delete story
       await this.storyRepository.remove(story);
 
       // Delete file in cloud and file record in DB
-      if (file) {
-        if (file.save_path) {
-          await cloudinary.uploader.destroy(file.save_path);
-        }
-        await this.fileRepository.remove(file);
+      if (story.file?.save_path) {
+        await cloudinary.uploader.destroy(story.file?.save_path);
       }
+      await this.fileRepository.remove(story.file!);
 
       return true;
     } catch (error) {
@@ -479,13 +484,13 @@ export class StoryService {
     });
 
     if (existingView) {
-      existingView.lastViewDate = viewData.lastViewDate || new Date();
+      existingView.lastViewDate = new Date();
       await this.viewRepository.save(existingView);
     } else {
       const view = this.viewRepository.create({
         story: story,
         user: user,
-        lastViewDate: viewData.lastViewDate || new Date(),
+        lastViewDate: new Date(),
       });
       await this.viewRepository.save(view);
 
