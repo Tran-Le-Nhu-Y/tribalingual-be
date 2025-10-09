@@ -6,6 +6,7 @@ import { GenreModule } from './genre/genre.module';
 import { FileModule } from './file/file.module';
 import { StoryModule } from './story/story.module';
 import { StoryHistoryModule } from './story-history/story-history.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { StoryHistoryModule } from './story-history/story-history.module';
     FileModule,
     StoryModule,
     StoryHistoryModule,
+    AuthModule,
   ],
 })
 export class AppModule {}

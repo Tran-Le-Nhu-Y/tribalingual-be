@@ -2,15 +2,21 @@ import { StoryHistoryEntity } from 'src/story-history/entity/story-history.entit
 import { CommentEntity } from 'src/story/entity/comment.entity';
 import { FavoriteEntity } from 'src/story/entity/favorite.entity';
 import { ViewEntity } from 'src/story/entity/view.entity';
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Entity, Column, OneToMany, PrimaryColumn } from 'typeorm';
 
 @Entity()
 export class UserEntity {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryColumn()
   id: string;
 
   @Column()
   username: string;
+
+  @Column({ nullable: true })
+  email?: string;
+
+  @Column({ nullable: true })
+  picture?: string;
 
   @OneToMany(() => CommentEntity, (comment) => comment.user)
   comments: CommentEntity[];
