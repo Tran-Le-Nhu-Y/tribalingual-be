@@ -7,6 +7,8 @@ import { FileModule } from './file/file.module';
 import { StoryModule } from './story/story.module';
 import { StoryHistoryModule } from './story-history/story-history.module';
 import { AuthModule } from './auth/auth.module';
+import { APP_GUARD } from '@nestjs/core';
+import { PermissionsGuard } from './auth/permission.guard';
 
 @Module({
   imports: [
@@ -31,6 +33,12 @@ import { AuthModule } from './auth/auth.module';
     StoryModule,
     StoryHistoryModule,
     AuthModule,
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: PermissionsGuard,
+    },
   ],
 })
 export class AppModule {}
