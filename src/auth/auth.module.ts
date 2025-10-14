@@ -1,13 +1,15 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { AuthController } from './auth.controller';
-import { AuthService } from './auth.service';
-import { UserEntity } from 'src/user/entity/user.entity';
+import { APP_GUARD } from '@nestjs/core';
+import { PermissionsGuard } from './permission.guard';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([UserEntity])],
-  controllers: [AuthController],
-  providers: [AuthService],
-  exports: [AuthService],
+  imports: [ConfigModule],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: PermissionsGuard,
+    },
+  ],
 })
 export class AuthModule {}

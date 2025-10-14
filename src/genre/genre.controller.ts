@@ -21,6 +21,8 @@ import {
 } from '@nestjs/swagger';
 import GenreResponse from './dto/genre-response.dto';
 import { PagingWrapper } from './dto/paging-wrapper.dto';
+import { Permissions } from 'src/auth/permission.decorator';
+import { Permission } from 'src/auth/enum/permission.enum';
 
 @Controller({ path: '/api/v1/genre' })
 export class GenreController {
@@ -29,6 +31,7 @@ export class GenreController {
     private readonly mapper: GenreMapper,
   ) {}
 
+  @Permissions(Permission.READ_GENRE)
   @Get('/all')
   @ApiOperation({ summary: 'Get all genres' })
   @ApiResponse({ type: PagingWrapper })
@@ -52,6 +55,7 @@ export class GenreController {
     };
   }
 
+  @Permissions(Permission.READ_GENRE)
   @Get('/genre/:id')
   @ApiOperation({ summary: 'Get genre by id' })
   async getGenreById(@Param('id') id: string) {
@@ -62,6 +66,7 @@ export class GenreController {
     return this.mapper.toResponse(genre);
   }
 
+  @Permissions(Permission.CREATE_GENRE)
   @Post('/create')
   @ApiOperation({ summary: 'Create a new genre' })
   async createGenre(@Body() body: CreateGenreBody) {
@@ -69,6 +74,7 @@ export class GenreController {
     return id;
   }
 
+  @Permissions(Permission.UPDATE_GENRE)
   @Put('/:id/update')
   @ApiOperation({ summary: 'Update a genre' })
   async updateGenre(@Param('id') id: string, @Body() body: UpdateGenreBody) {
@@ -79,6 +85,7 @@ export class GenreController {
     return this.mapper.toResponse(updatedGenre);
   }
 
+  @Permissions(Permission.DELETE_GENRE)
   @Delete('/:id/delete')
   @ApiOperation({ summary: 'Delete a genre by id' })
   @ApiOkResponse({

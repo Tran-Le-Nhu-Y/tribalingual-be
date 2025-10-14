@@ -9,3 +9,7 @@ cloudinary:
   cloud_name: test
   api_key: test
   api_secret: test
+auth0:
+  issuer: https://<tenant>.auth0.com/
+  audience: http://localhost:3000/api
+  jwks: https://<tenant>.auth0.com/.well-known/jwks.json

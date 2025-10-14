@@ -25,12 +25,11 @@ import { AuthModule } from './auth/auth.module';
       }),
       inject: [ConfigService],
     }),
-
+    AuthModule,
     GenreModule,
     FileModule,
     StoryModule,
     StoryHistoryModule,
-    AuthModule,
   ],
 })
 export class AppModule {}
