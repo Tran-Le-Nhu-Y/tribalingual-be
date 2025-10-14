@@ -9,3 +9,7 @@ cloudinary:
   cloud_name: test
   api_key: test
   api_secret: test
+auth0:
+  issuer: issuer-uri
+  audience: http://localhost:3000/api
+  secret: client-secret
