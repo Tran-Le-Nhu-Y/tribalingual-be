@@ -14,6 +14,7 @@ import GenreEntity from 'src/genre/entity/genre.entity';
 import FileEntity from 'src/file/entity/file.entity';
 import { FileMapper } from 'src/file/file.mapper';
 import { GenreMapper } from 'src/genre/genre.mapper';
+import { UserMapper } from 'src/user/user.mapper';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { GenreMapper } from 'src/genre/genre.mapper';
     CommentMapper,
     FileMapper,
     GenreMapper,
+    UserMapper,
   ],
   exports: [StoryService],
 })

@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import UserResponse from 'src/user/dto/user-response';
 export class CommentResponse {
   @ApiProperty({
     description: 'Comment id',
@@ -23,7 +24,14 @@ export class CommentResponse {
 
   @ApiProperty({
     description: 'User id this comment belongs to',
-    format: 'uuid',
+    format: 'string',
   })
   userId: string;
+
+  @ApiProperty({
+    description: 'Author of the comment',
+    required: false,
+    type: () => UserResponse,
+  })
+  user?: UserResponse | null;
 }

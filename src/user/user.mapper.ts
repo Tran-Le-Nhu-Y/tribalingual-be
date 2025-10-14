@@ -10,6 +10,8 @@ export class UserMapper {
     return {
       id: entity.id,
       username: entity.username,
+      email: entity.email,
+      avatarUrl: entity.avatarUrl,
     } as User;
   }
 

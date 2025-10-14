@@ -26,12 +26,12 @@ export class AuthService {
         id: auth0User.sub,
         username: auth0User.name || auth0User.email?.split('@')[0] || 'Unknown',
         email: auth0User.email,
-        picture: auth0User.picture,
+        avatarUrl: auth0User.picture,
       });
     } else {
       user.username = auth0User.name || user.username;
       user.email = auth0User.email ?? user.email;
-      user.picture = auth0User.picture ?? user.picture;
+      user.avatarUrl = auth0User.picture ?? user.avatarUrl;
     }
 
     return await this.userRepository.save(user);

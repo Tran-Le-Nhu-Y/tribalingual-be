@@ -8,7 +8,6 @@ export class CreateCommentBody {
   })
   storyId: string;
 
-  @IsUUID()
   @ApiProperty({
     description: 'Author Id',
     minLength: 1,

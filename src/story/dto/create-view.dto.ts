@@ -8,7 +8,6 @@ export class CreateViewBody {
   })
   storyId: string;
 
-  @IsUUID()
   @ApiProperty({
     description: 'User Id',
     required: true,

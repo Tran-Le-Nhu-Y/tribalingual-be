@@ -16,7 +16,7 @@ export class UserEntity {
   email?: string;
 
   @Column({ nullable: true })
-  picture?: string;
+  avatarUrl?: string;
 
   @OneToMany(() => CommentEntity, (comment) => comment.user)
   comments: CommentEntity[];

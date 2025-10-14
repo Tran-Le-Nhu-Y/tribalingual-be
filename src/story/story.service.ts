@@ -406,7 +406,6 @@ export class StoryService {
     }
 
     const existingFavorite = await this.favoriteRepository.findOne({
-      // check ko xài thì đổi thành exist
       where: {
         story: { id: favoriteData.storyId },
         user: { id: favoriteData.userId },
