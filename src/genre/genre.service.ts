@@ -21,7 +21,7 @@ export class GenreService {
     return this.genreRepository.findAndCount({
       skip: offset,
       take: limit,
-      order: { name: 'ASC' }, // có thể sắp xếp theo tên
+      order: { name: 'ASC' },
     });
   }
 

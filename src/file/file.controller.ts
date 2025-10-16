@@ -25,6 +25,8 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import FileResponse from './dto/file-response.dto';
 import { PagingWrapper } from './dto/paging-wrapper.dto';
+import { Permission } from 'src/auth/enum/permission.enum';
+import { Permissions } from 'src/auth/permission.decorator';
 
 @Controller({ path: '/api/v1/file' })
 export class FileController {
@@ -33,13 +35,7 @@ export class FileController {
     private readonly mapper: FileMapper,
   ) {}
 
-  //   @Get('/all')
-  //   @ApiOperation({ summary: 'Get all files metadata' })
-  //   async getAllFiles() {
-  //     const files = await this.service.findAll();
-  //     return files.map((model) => this.mapper.toResponse(model));
-  //   }
-
+  @Permissions(Permission.READ_FILE)
   @Get('/all')
   @ApiOperation({ summary: 'Get all files metadata' })
   @ApiResponse({ type: PagingWrapper })
@@ -63,6 +59,7 @@ export class FileController {
     };
   }
 
+  @Permissions(Permission.READ_FILE)
   @Get('/:id')
   @ApiOperation({ summary: 'Get file by id' })
   async getFileById(@Param('id') id: string) {
@@ -73,18 +70,7 @@ export class FileController {
     return this.mapper.toResponse(file);
   }
 
-  //   @Get('/:id/show')
-  //   @ApiOperation({ summary: 'Show image by id' })
-  //   async showFile(@Param('id') id: string) {
-  //     const file = await this.service.findOne(id);
-  //     if (!file) {
-  //       throw new NotFoundException(`File with id ${id} not found`);
-  //     }
-
-  //     // Cloudinary save url (https://res.cloudinary.com/xxx/image/upload/abc.jpg)
-  //     return { url: file.url };
-  //   }
-
+  @Permissions(Permission.CREATE_FILE)
   @Post('/upload')
   @ApiOperation({ summary: 'Upload a file (single file), return id' })
   @ApiConsumes('multipart/form-data')
@@ -115,6 +101,7 @@ export class FileController {
     return savedFile;
   }
 
+  @Permissions(Permission.DELETE_FILE)
   @Delete('/:id/delete')
   @ApiOperation({ summary: 'Delete a file by id' })
   @ApiOkResponse({

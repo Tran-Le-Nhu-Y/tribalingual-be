@@ -27,6 +27,8 @@ import { CreateViewBody } from './dto/create-view.dto';
 import { UpdateStoryBody } from './dto/update-story.dto';
 import { PagingWrapper } from './dto/paging-wrapper.dto';
 import { StoryStatus } from './entity/story.entity';
+import { Permission } from 'src/auth/enum/permission.enum';
+import { Permissions } from 'src/auth/permission.decorator';
 
 @ApiTags('Story')
 @Controller({ path: '/api/v1/story' })
@@ -59,6 +61,7 @@ export class StoryController {
   //     };
   //   }
 
+  @Permissions(Permission.READ_STORY)
   @Get('/all')
   @ApiOperation({ summary: 'Get all stories (optionally filtered by status)' })
   @ApiResponse({ type: PagingWrapper })
@@ -88,6 +91,7 @@ export class StoryController {
     };
   }
 
+  @Permissions(Permission.READ_STORY)
   @Get('/:id')
   @ApiOperation({ summary: 'Get story by id' })
   @ApiResponse({ type: StoryResponse })
@@ -99,6 +103,7 @@ export class StoryController {
     return this.mapper.toResponse(story);
   }
 
+  @Permissions(Permission.CREATE_STORY)
   @Post('/create')
   @ApiOperation({ summary: 'Create a new story' })
   async createStory(@Body() body: CreateStoryBody) {
@@ -106,6 +111,7 @@ export class StoryController {
     return id;
   }
 
+  @Permissions(Permission.UPDATE_STORY)
   @Put('/:id/update')
   @ApiOperation({ summary: 'Update a story' })
   async updateStory(
@@ -119,6 +125,7 @@ export class StoryController {
     return updatedStory;
   }
 
+  @Permissions(Permission.PUBLISH_STORY)
   @Put('/:id/publish')
   @ApiOperation({ summary: 'Publish a story (admin only)' })
   @ApiResponse({ type: StoryResponse })
@@ -133,6 +140,7 @@ export class StoryController {
     return this.mapper.toResponse(story);
   }
 
+  @Permissions(Permission.DELETE_STORY)
   @Delete('/:id/delete')
   @ApiOperation({ summary: 'Delete a story by id' })
   @ApiOkResponse({
@@ -153,20 +161,8 @@ export class StoryController {
     return { message: `Story with id ${storyId} deleted successfully` };
   }
 
-  //   @Delete('/delete/:id')
-  //   @ApiOperation({ summary: 'Delete a story by id' })
-  //   async deleteStory(@Param('id') storyId: string, @Req() req) {
-  //     const userId = req.user.id; // lấy từ JWT guard
-  //     const deleted = await this.service.remove(storyId, userId);
-
-  //     if (!deleted) {
-  //       throw new NotFoundException(`Story with id ${storyId} not found`);
-  //     }
-
-  //     return { message: `Story with id ${storyId} deleted successfully` };
-  //   }
-
   // Comment methods
+  @Permissions(Permission.CREATE_COMMENT)
   @Post(':id/comment/create')
   @ApiOperation({ summary: 'Comment story' })
   async addComment(@Body() commentData: CreateCommentBody) {
@@ -174,6 +170,7 @@ export class StoryController {
     return id;
   }
 
+  @Permissions(Permission.READ_COMMENT)
   @Get(':id/comments/all')
   @ApiResponse({ type: [CommentResponse] })
   @ApiOperation({ summary: 'Get all comments for a story' })
@@ -181,6 +178,7 @@ export class StoryController {
     return this.service.findAllComments(storyId);
   }
 
+  @Permissions(Permission.DELETE_COMMENT)
   @Delete('/comment/:id/delete')
   @ApiOperation({ summary: 'Delete a comment by comment id' })
   @ApiOkResponse({
@@ -199,6 +197,7 @@ export class StoryController {
   }
 
   // Favorite methods
+  @Permissions(Permission.CREATE_FAVORITE)
   @Post(':id/favorite/add')
   @ApiOperation({ summary: 'Add favorite for story' })
   @ApiOkResponse({
@@ -221,6 +220,7 @@ export class StoryController {
     };
   }
 
+  @Permissions(Permission.DELETE_FAVORITE)
   @Delete(':storyId/favorite/delete/:userId')
   @ApiOperation({ summary: 'Delete a favorite by story id and user id' })
   @ApiOkResponse({
@@ -247,6 +247,7 @@ export class StoryController {
   }
 
   // View methods
+  @Permissions(Permission.CREATE_VIEW)
   @Post(':id/view/add')
   @ApiOperation({ summary: 'Add view for story' })
   @ApiOkResponse({

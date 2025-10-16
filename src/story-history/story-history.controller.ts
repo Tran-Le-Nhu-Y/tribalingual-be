@@ -17,6 +17,8 @@ import { StoryHistoryService } from './story-history.service';
 import { StoryHistoryMapper } from './story-content.mapper';
 import StoryHistoryResponse from './dto/story-history-response.dto';
 import { CreateStoryHistoryBody } from './dto/create-story-history.dto';
+import { Permission } from 'src/auth/enum/permission.enum';
+import { Permissions } from 'src/auth/permission.decorator';
 
 @ApiTags('Story History')
 @Controller({ path: '/api/v1/story-history' })
@@ -26,6 +28,7 @@ export class StoryHistoryController {
     private readonly mapper: StoryHistoryMapper,
   ) {}
 
+  @Permissions(Permission.READ_STORY_HISTORY)
   @Get('/all')
   @ApiOperation({ summary: 'Get all histories' })
   @ApiResponse({ type: [StoryHistoryResponse] })
@@ -34,6 +37,7 @@ export class StoryHistoryController {
     return this.mapper.toResponseList(histories);
   }
 
+  @Permissions(Permission.READ_STORY_HISTORY)
   @Get('/:id')
   @ApiOperation({ summary: 'Get story history by id' })
   @ApiResponse({ type: StoryHistoryResponse })
@@ -45,6 +49,7 @@ export class StoryHistoryController {
     return this.mapper.toResponse(history);
   }
 
+  @Permissions(Permission.CREATE_STORY_HISTORY)
   @Post('/create')
   @ApiOperation({ summary: 'Create a new story history record' })
   async createHistory(@Body() body: CreateStoryHistoryBody) {
@@ -52,6 +57,7 @@ export class StoryHistoryController {
     return id;
   }
 
+  @Permissions(Permission.DELETE_STORY_HISTORY)
   @Delete('/:id/delete')
   @ApiOkResponse({
     schema: {
