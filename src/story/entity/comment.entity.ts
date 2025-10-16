@@ -16,7 +16,7 @@ export class CommentEntity {
   @Column('uuid')
   storyId: string;
 
-  @Column('uuid')
+  @Column({ type: 'varchar' })
   userId: string;
 
   @Column({ type: 'text' })

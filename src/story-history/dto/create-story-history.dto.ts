@@ -9,7 +9,6 @@ export class CreateStoryHistoryBody {
   })
   storyId: string;
 
-  @IsUUID()
   @ApiProperty({
     description: 'User Id',
   })
@@ -38,7 +37,6 @@ export class CreateStoryHistoryBody {
   storyTitle?: string;
 
   @IsOptional()
-  @IsUUID()
   @ApiProperty({
     description: 'Snapshot author id of story at the time of action',
     required: false,

@@ -23,7 +23,7 @@ export class CommentResponse {
 
   @ApiProperty({
     description: 'User id this comment belongs to',
-    format: 'uuid',
+    format: 'string',
   })
   userId: string;
 }

@@ -32,10 +32,10 @@ export default class StoryEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'uuid' })
+  @Column({ type: 'varchar' })
   authorId: string;
 
-  @Column({ type: 'uuid', nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   adminId?: string;
 
   @Column({ type: 'uuid' })

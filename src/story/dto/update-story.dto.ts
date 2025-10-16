@@ -3,10 +3,9 @@ import { IsEnum, IsOptional, IsString, IsUUID } from 'class-validator';
 import { StoryStatus, Language } from '../entity/story.entity';
 
 export class UpdateStoryBody {
-  @IsUUID()
   @ApiProperty({
     description: 'User ID who performs the update',
-    format: 'uuid',
+    format: 'string',
   })
   userId: string;
 

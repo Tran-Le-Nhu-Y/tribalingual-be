@@ -11,7 +11,7 @@ export default class StoryResponse {
   @ApiProperty({ description: 'Author id', format: 'uuid' })
   authorId: string;
 
-  @ApiProperty({ description: 'Admin id', format: 'uuid', required: false })
+  @ApiProperty({ description: 'Admin id', format: 'string', required: false })
   adminId?: string;
 
   @ApiProperty({ description: 'Genre id', format: 'uuid' })

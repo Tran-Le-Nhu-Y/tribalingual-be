@@ -9,8 +9,7 @@ import {
 import { StoryStatus, Language } from '../entity/story.entity';
 
 export class CreateStoryBody {
-  @ApiProperty({ description: 'Author ID', format: 'uuid' })
-  @IsUUID()
+  @ApiProperty({ description: 'Author ID', format: 'string' })
   authorId: string;
 
   @ApiProperty({ description: 'Genre ID', format: 'uuid' })

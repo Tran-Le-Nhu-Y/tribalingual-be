@@ -9,7 +9,6 @@ export class UserMapper {
   toModel(entity: UserEntity) {
     return {
       id: entity.id,
-      username: entity.username,
     } as User;
   }
 

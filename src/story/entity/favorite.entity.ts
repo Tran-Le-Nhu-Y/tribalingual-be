@@ -7,7 +7,7 @@ export class FavoriteEntity {
   @PrimaryColumn('uuid')
   storyId: string;
 
-  @PrimaryColumn('uuid')
+  @PrimaryColumn({ type: 'varchar' })
   userId: string;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })

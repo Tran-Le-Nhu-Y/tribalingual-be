@@ -7,7 +7,7 @@ export class ViewEntity {
   @PrimaryColumn('uuid')
   storyId: string;
 
-  @PrimaryColumn('uuid')
+  @PrimaryColumn({ type: 'varchar' })
   userId: string;
 
   @Column({ type: 'timestamp' })
