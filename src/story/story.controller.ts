@@ -10,6 +10,7 @@ import {
   Query,
 } from '@nestjs/common';
 import {
+  ApiBearerAuth,
   ApiOkResponse,
   ApiOperation,
   ApiQuery,
@@ -31,6 +32,7 @@ import { Permission } from 'src/auth/enum/permission.enum';
 import { Permissions } from 'src/auth/permission.decorator';
 
 @ApiTags('Story')
+@ApiBearerAuth('access-token')
 @Controller({ path: '/api/v1/story' })
 export class StoryController {
   constructor(

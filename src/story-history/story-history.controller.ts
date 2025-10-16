@@ -8,6 +8,7 @@ import {
   Post,
 } from '@nestjs/common';
 import {
+  ApiBearerAuth,
   ApiOkResponse,
   ApiOperation,
   ApiResponse,
@@ -21,6 +22,7 @@ import { Permission } from 'src/auth/enum/permission.enum';
 import { Permissions } from 'src/auth/permission.decorator';
 
 @ApiTags('Story History')
+@ApiBearerAuth('access-token')
 @Controller({ path: '/api/v1/story-history' })
 export class StoryHistoryController {
   constructor(

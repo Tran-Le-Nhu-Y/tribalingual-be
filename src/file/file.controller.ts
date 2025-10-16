@@ -13,6 +13,7 @@ import {
 import { FileService } from './file.service';
 import { FileMapper } from './file.mapper';
 import {
+  ApiBearerAuth,
   ApiBody,
   ApiConsumes,
   ApiCreatedResponse,
@@ -21,6 +22,7 @@ import {
   ApiOperation,
   ApiQuery,
   ApiResponse,
+  ApiTags,
 } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import FileResponse from './dto/file-response.dto';
@@ -28,6 +30,8 @@ import { PagingWrapper } from './dto/paging-wrapper.dto';
 import { Permission } from 'src/auth/enum/permission.enum';
 import { Permissions } from 'src/auth/permission.decorator';
 
+@ApiTags('File')
+@ApiBearerAuth('access-token')
 @Controller({ path: '/api/v1/file' })
 export class FileController {
   constructor(

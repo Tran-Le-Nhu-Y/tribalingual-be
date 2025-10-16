@@ -14,16 +14,20 @@ import { GenreMapper } from './genre.mapper';
 import CreateGenreBody from './dto/create-genre.dto';
 import UpdateGenreBody from './dto/update-genre.dto';
 import {
+  ApiBearerAuth,
   ApiOkResponse,
   ApiOperation,
   ApiQuery,
   ApiResponse,
+  ApiTags,
 } from '@nestjs/swagger';
 import GenreResponse from './dto/genre-response.dto';
 import { PagingWrapper } from './dto/paging-wrapper.dto';
 import { Permissions } from 'src/auth/permission.decorator';
 import { Permission } from 'src/auth/enum/permission.enum';
 
+@ApiTags('Genre')
+@ApiBearerAuth('access-token')
 @Controller({ path: '/api/v1/genre' })
 export class GenreController {
   constructor(

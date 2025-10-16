@@ -30,6 +30,15 @@ async function bootstrap() {
       'This API is used for Trilangual Project. This is built by NestJS',
     )
     .setVersion('0.0.1-SNAPSHOT')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        description: 'Enter JWT token (without Bearer prefix)',
+      },
+      'access-token', // Tên này sẽ dùng để liên kết với @ApiBearerAuth() ở controller
+    )
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, documentFactory);
