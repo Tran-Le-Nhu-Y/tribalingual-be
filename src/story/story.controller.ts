@@ -30,6 +30,7 @@ import { PagingWrapper } from './dto/paging-wrapper.dto';
 import { StoryStatus } from './entity/story.entity';
 import { Permission } from 'src/auth/enum/permission.enum';
 import { Permissions } from 'src/auth/permission.decorator';
+import { CommentMapper } from './mapper/comment.mapper';
 
 @ApiTags('Story')
 @ApiBearerAuth('access-token')
@@ -38,6 +39,7 @@ export class StoryController {
   constructor(
     private readonly service: StoryService,
     private readonly mapper: StoryMapper,
+    private readonly commentMapper: CommentMapper,
   ) {}
 
   //   @Get('/all')
@@ -174,10 +176,32 @@ export class StoryController {
 
   @Permissions(Permission.READ_COMMENT)
   @Get(':id/comments/all')
-  @ApiResponse({ type: [CommentResponse] })
-  @ApiOperation({ summary: 'Get all comments for a story' })
-  async getComments(@Param('id') storyId: string): Promise<CommentResponse[]> {
-    return this.service.findAllComments(storyId);
+  @ApiOperation({ summary: 'Get all comments of a story by story ID' })
+  @ApiResponse({ type: PagingWrapper })
+  @ApiQuery({ name: 'offset', type: Number, required: false, example: 0 })
+  @ApiQuery({ name: 'limit', type: Number, required: false, example: 20 })
+  async getAllComments(
+    @Param('id') storyId: string,
+    @Query('offset') offset = 0,
+    @Query('limit') limit = 20,
+  ): Promise<PagingWrapper<CommentResponse>> {
+    const [entities, total] = await this.service.findAllCommentsWithPaging(
+      offset,
+      limit,
+      storyId,
+    );
+
+    const content = entities.map((entity) =>
+      this.commentMapper.toResponse(entity),
+    );
+
+    return {
+      content,
+      page_number: Math.floor(offset / limit),
+      page_size: limit,
+      total_elements: total,
+      total_pages: Math.ceil(total / limit),
+    };
   }
 
   @Permissions(Permission.DELETE_COMMENT)

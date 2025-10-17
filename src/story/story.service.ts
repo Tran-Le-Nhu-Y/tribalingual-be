@@ -348,6 +348,24 @@ export class StoryService {
     return this.commentMapper.toResponseList(comments);
   }
 
+  async findAllCommentsWithPaging(
+    offset: number,
+    limit: number,
+    storyId: string,
+  ): Promise<[CommentEntity[], number]> {
+    const story = await this.storyRepository.findOneBy({ id: storyId });
+    if (!story) {
+      throw new NotFoundException(`Story with id ${storyId} not found`);
+    }
+    return this.commentRepository.findAndCount({
+      skip: offset,
+      take: limit,
+      where: { story: { id: storyId } },
+      order: { createdAt: 'DESC' },
+      relations: ['story', 'user'],
+    });
+  }
+
   async updateComment(
     commentId: string,
     data: Partial<Comment>,
