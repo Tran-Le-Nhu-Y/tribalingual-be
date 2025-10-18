@@ -24,4 +24,6 @@ export enum Permission {
   READ_STORY_HISTORY = 'read:story_history',
   CREATE_STORY_HISTORY = 'create:story_history',
   DELETE_STORY_HISTORY = 'delete:story_history',
+
+  READ_USER = 'read:users',
 }

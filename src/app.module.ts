@@ -7,6 +7,7 @@ import { FileModule } from './file/file.module';
 import { StoryModule } from './story/story.module';
 import { StoryHistoryModule } from './story-history/story-history.module';
 import { AuthModule } from './auth/auth.module';
+import { Auth0UserModule } from './auth/auth0-user.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { AuthModule } from './auth/auth.module';
     FileModule,
     StoryModule,
     StoryHistoryModule,
+    Auth0UserModule,
   ],
 })
 export class AppModule {}
