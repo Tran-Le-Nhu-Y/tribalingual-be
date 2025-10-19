@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import UserResponse from 'src/user/dto/user-response';
+import UserResponse from 'src/user/dto/user-response.dto';
 import StoryResponse from './story-response.dto';
 export class FavoriteResponse {
   @ApiProperty({
