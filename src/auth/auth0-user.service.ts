@@ -2,9 +2,6 @@ import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import TokenResponse from './interface/token-response.interface';
 import Auth0User from './interface/auth0-user.interface';
-import { UserEntity } from 'src/user/entity/user.entity';
-import { Repository } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class Auth0UserService {
@@ -16,12 +13,7 @@ export class Auth0UserService {
   private readonly clientSecret: string;
   private readonly managementAudience: string;
 
-  constructor(
-    @InjectRepository(UserEntity)
-    private readonly userRepository: Repository<UserEntity>,
-
-    private readonly configService: ConfigService,
-  ) {
+  constructor(private readonly configService: ConfigService) {
     this.domain = this.configService.get<string>('auth0.domain')!;
     this.clientId = this.configService.get<string>('auth0.client_id')!;
     this.clientSecret = this.configService.get<string>('auth0.client_secret')!;
@@ -127,16 +119,5 @@ export class Auth0UserService {
         HttpStatus.BAD_GATEWAY,
       );
     }
-  }
-
-  async syncUserFromAuth0(auth0User: { id: string }): Promise<boolean> {
-    let user = await this.userRepository.findOneBy({ id: auth0User.id });
-    if (!user) {
-      user = this.userRepository.create({
-        id: auth0User.id,
-      });
-    }
-    const savedEntity = await this.userRepository.save(user);
-    return savedEntity !== null;
   }
 }

@@ -5,6 +5,10 @@ import { Permission } from './enum/permission.enum';
 import { PERMISSIONS_KEY } from './permission.decorator';
 import { createRemoteJWKSet, jwtVerify, JWTVerifyOptions } from 'jose';
 import AuthzPayload from './interface/jwt.interface';
+import { Auth0UserService } from './auth0-user.service';
+import { UserEntity } from 'src/user/entity/user.entity';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class PermissionsGuard implements CanActivate {
@@ -14,6 +18,11 @@ export class PermissionsGuard implements CanActivate {
   constructor(
     private reflector: Reflector,
     private configService: ConfigService,
+
+    @InjectRepository(UserEntity)
+    private readonly userRepository: Repository<UserEntity>,
+
+    private auth0UserService: Auth0UserService,
   ) {
     const jwksUrl = this.configService.get<string>('auth0.jwks');
     if (jwksUrl === undefined) throw new Error('Please configure JWKs URL.');
@@ -44,9 +53,13 @@ export class PermissionsGuard implements CanActivate {
         this.verifyOptions,
       );
 
-      return requiredPermissions.every((permission) =>
+      const hasPermissions = requiredPermissions.every((permission) =>
         payload.permissions.includes(permission),
       );
+      if (!hasPermissions) return false;
+
+      const synced = await this.ensureUserExists(payload);
+      return synced;
     } catch (error) {
       console.warn(error);
       return false;
@@ -59,5 +72,22 @@ export class PermissionsGuard implements CanActivate {
     if (authHeader.length !== 2) return undefined;
     const [type, token] = authHeader;
     return type === 'Bearer' ? token : undefined;
+  }
+  private async ensureUserExists(payload: AuthzPayload): Promise<boolean> {
+    const userId = payload.sub;
+    if (!userId) return false;
+
+    const userExists = await this.userRepository.findOne({
+      where: { id: userId },
+    });
+    if (userExists) return true;
+
+    const auth0User = await this.auth0UserService.getUserProfile(userId);
+    if (!auth0User) return false;
+
+    await this.userRepository.save({
+      id: auth0User.user_id,
+    });
+    return true;
   }
 }
