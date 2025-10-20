@@ -476,6 +476,29 @@ export class StoryService {
     return false; // true if a row was deleted, false otherwise
   }
 
+  async isFavorited(storyId: string, userId: string): Promise<boolean> {
+    const favorite = await this.favoriteRepository.findOne({
+      where: { storyId: storyId, userId: userId },
+    });
+    return favorite ? true : false;
+  }
+
+  async findAllFavoritesByUser(userId: string): Promise<StoryEntity[]> {
+    const user = await this.userRepository.findOneBy({ id: userId });
+    if (!user) {
+      throw new NotFoundException(`User with id ${userId} not found`);
+    }
+    const favorites = await this.favoriteRepository.find({
+      where: { userId },
+      relations: ['story', 'story.genre', 'story.file'],
+      order: { addedDate: 'DESC' },
+    });
+
+    return favorites
+      .filter((fav) => fav.story !== null)
+      .map((fav) => fav.story);
+  }
+
   //View methods
   async addView(viewData: CreateViewBody): Promise<boolean> {
     const story = await this.storyRepository.findOneBy({

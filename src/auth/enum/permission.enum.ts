@@ -19,6 +19,7 @@ export enum Permission {
   DELETE_COMMENT = 'delete:comment',
   CREATE_FAVORITE = 'create:favorite',
   DELETE_FAVORITE = 'delete:favorite',
+  READ_FAVORITE = 'read:favorite',
   CREATE_VIEW = 'create:view',
 
   READ_STORY_HISTORY = 'read:story_history',

@@ -272,6 +272,26 @@ export class StoryController {
     };
   }
 
+  @Permissions(Permission.READ_FAVORITE)
+  @Get(':storyId/favorite/is-favorited/:userId')
+  @ApiOperation({ summary: 'Check if a story is favorited by a user' })
+  async isFavorited(
+    @Param('storyId') storyId: string,
+    @Param('userId') userId: string,
+  ): Promise<boolean> {
+    return this.service.isFavorited(storyId, userId);
+  }
+
+  @Permissions(Permission.READ_FAVORITE)
+  @Get('/favorite/all')
+  @ApiOperation({ summary: 'Get all favorited stories by userId' })
+  @ApiQuery({ name: 'userId', type: String, required: true })
+  @ApiResponse({ type: [StoryResponse] })
+  async getAllFavoritedStories(@Query('userId') userId: string) {
+    const stories = await this.service.findAllFavoritesByUser(userId);
+    return stories.map((story) => this.mapper.toResponse(story));
+  }
+
   // View methods
   @Permissions(Permission.CREATE_VIEW)
   @Post(':id/view/add')
