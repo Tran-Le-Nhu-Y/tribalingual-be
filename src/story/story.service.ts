@@ -95,6 +95,20 @@ export class StoryService {
     return story;
   }
 
+  async findAllByAuthorIdWithPaging(
+    offset: number,
+    limit: number,
+    authorId: string,
+  ): Promise<[StoryEntity[], number]> {
+    return this.storyRepository.findAndCount({
+      skip: offset,
+      take: limit,
+      where: { authorId: authorId },
+      order: { publishedDate: 'DESC' },
+      relations: ['genre', 'file'],
+    });
+  }
+
   async create(data: CreateStoryBody): Promise<string> {
     const author = await this.userRepository.findOneBy({
       id: data.authorId,

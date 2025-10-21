@@ -27,7 +27,7 @@ import { CreateFavoriteBody } from './dto/create-favorite.dto';
 import { CreateViewBody } from './dto/create-view.dto';
 import { UpdateStoryBody } from './dto/update-story.dto';
 import { PagingWrapper } from './dto/paging-wrapper.dto';
-import { StoryStatus } from './entity/story.entity';
+import StoryEntity, { StoryStatus } from './entity/story.entity';
 import { Permission } from 'src/auth/enum/permission.enum';
 import { Permissions } from 'src/auth/permission.decorator';
 import { CommentMapper } from './mapper/comment.mapper';
@@ -67,7 +67,9 @@ export class StoryController {
 
   @Permissions(Permission.READ_STORY)
   @Get('/all')
-  @ApiOperation({ summary: 'Get all stories (optionally filtered by status)' })
+  @ApiOperation({
+    summary: 'Get all stories (optionally filtered by status or authorId)',
+  })
   @ApiResponse({ type: PagingWrapper })
   @ApiQuery({ name: 'offset', type: Number, required: false, example: 0 })
   @ApiQuery({ name: 'limit', type: Number, required: false, example: 20 })
@@ -77,14 +79,35 @@ export class StoryController {
     required: false,
     example: StoryStatus.PENDING,
   })
+  @ApiQuery({
+    name: 'authorId',
+    type: String,
+    required: false,
+  })
   async getAllStories(
     @Query('offset') offset = 0,
     @Query('limit') limit = 20,
     @Query('status') status?: StoryStatus,
+    @Query('authorId') authorId?: string,
   ): Promise<PagingWrapper<StoryResponse>> {
-    const [entities, total] = status
-      ? await this.service.findAllByStatusWithPaging(offset, limit, status)
-      : await this.service.findAllWithPaging(offset, limit);
+    let entities: StoryEntity[] = [];
+    let total = 0;
+
+    if (status) {
+      [entities, total] = await this.service.findAllByStatusWithPaging(
+        offset,
+        limit,
+        status,
+      );
+    } else if (authorId) {
+      [entities, total] = await this.service.findAllByAuthorIdWithPaging(
+        offset,
+        limit,
+        authorId,
+      );
+    } else {
+      [entities, total] = await this.service.findAllWithPaging(offset, limit);
+    }
     const content = entities.map((entity) => this.mapper.toResponse(entity));
     return {
       content,
