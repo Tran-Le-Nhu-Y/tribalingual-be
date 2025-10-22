@@ -10,6 +10,8 @@ export default interface Story {
   title: string;
   description: string;
   language: string;
+  viewLink?: string | null;
+  gameLink?: string | null;
   hmongContent?: string | null;
   englishContent?: string | null;
   vietnameseContent?: string | null;

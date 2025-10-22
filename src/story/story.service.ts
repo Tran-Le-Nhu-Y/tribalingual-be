@@ -207,11 +207,24 @@ export class StoryService {
       story.file = newFile;
     }
 
+    if (data.genreId && data.genreId !== story.genreId) {
+      const newGenre = await this.genreRepository.findOne({
+        where: { id: data.genreId },
+      });
+      if (!newGenre) {
+        throw new NotFoundException(`Genre with id ${data.genreId} not found`);
+      }
+      story.genre = newGenre;
+      story.genreId = data.genreId;
+    }
+
     Object.assign(story, {
       genreId: data.genreId,
       title: data.title,
       description: data.description,
       language: data.language,
+      viewLink: data.viewLink,
+      gameLink: data.gameLink,
       hmongContent: data.hmongContent,
       englishContent: data.englishContent,
       vietnameseContent: data.vietnameseContent,

@@ -40,6 +40,16 @@ export class UpdateStoryBody {
 
   @IsOptional()
   @IsString()
+  @ApiPropertyOptional({ description: 'Access link to read story' })
+  viewLink?: string;
+
+  @IsOptional()
+  @IsString()
+  @ApiPropertyOptional({ description: 'Access link to play game' })
+  gameLink?: string;
+
+  @IsOptional()
+  @IsString()
   @ApiPropertyOptional({ description: 'Content in Hmong' })
   hmongContent?: string;
 

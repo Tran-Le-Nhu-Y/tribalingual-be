@@ -37,6 +37,12 @@ export default class StoryResponse {
   @ApiProperty({ description: 'Language', enum: Language })
   language: Language;
 
+  @ApiProperty({ description: 'Access link to read story' })
+  viewLink?: string | null;
+
+  @ApiProperty({ description: 'Access link to play game' })
+  gameLink?: string | null;
+
   @ApiProperty({ description: 'Content in Hmong language' })
   hmongContent?: string | null;
 

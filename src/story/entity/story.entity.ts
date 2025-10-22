@@ -54,6 +54,12 @@ export default class StoryEntity {
   language: Language;
 
   @Column({ type: 'text', nullable: true })
+  viewLink?: string;
+
+  @Column({ type: 'text', nullable: true })
+  gameLink?: string;
+
+  @Column({ type: 'text', nullable: true })
   hmongContent?: string;
 
   @Column({ type: 'text', nullable: true })
