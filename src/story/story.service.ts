@@ -1,4 +1,4 @@
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   ConflictException,
@@ -104,6 +104,28 @@ export class StoryService {
       skip: offset,
       take: limit,
       where: { authorId: authorId },
+      order: { publishedDate: 'DESC' },
+      relations: ['genre', 'file'],
+    });
+  }
+
+  async searchByTitleWithPaging(
+    offset: number,
+    limit: number,
+    title: string,
+  ): Promise<[StoryEntity[], number]> {
+    if (!title || title.trim() === '') {
+      return this.storyRepository.findAndCount({
+        skip: offset,
+        take: limit,
+        order: { publishedDate: 'DESC' },
+        relations: ['genre', 'file'],
+      });
+    }
+    return this.storyRepository.findAndCount({
+      where: { title: Like(`%${title}%`) },
+      skip: offset,
+      take: limit,
       order: { publishedDate: 'DESC' },
       relations: ['genre', 'file'],
     });

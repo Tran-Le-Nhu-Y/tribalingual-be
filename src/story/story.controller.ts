@@ -119,6 +119,41 @@ export class StoryController {
   }
 
   @Permissions(Permission.READ_STORY)
+  @Get('/search')
+  @ApiOperation({
+    summary: 'Search story by title',
+  })
+  @ApiResponse({ type: PagingWrapper })
+  @ApiQuery({ name: 'offset', type: Number, required: false, example: 0 })
+  @ApiQuery({ name: 'limit', type: Number, required: false, example: 10 })
+  @ApiQuery({
+    name: 'title',
+    type: String,
+    required: false,
+  })
+  async searchStories(
+    @Query('title') title: string,
+    @Query('offset') offset = 0,
+    @Query('limit') limit = 10,
+  ) {
+    const [entities, total] = await this.service.searchByTitleWithPaging(
+      offset,
+      limit,
+      title,
+    );
+
+    const content = entities.map((entity) => this.mapper.toResponse(entity));
+
+    return {
+      content,
+      page_number: Math.floor(offset / limit),
+      page_size: limit,
+      total_elements: total,
+      total_pages: Math.ceil(total / limit),
+    };
+  }
+
+  @Permissions(Permission.READ_STORY)
   @Get('/:id')
   @ApiOperation({ summary: 'Get story by id' })
   @ApiResponse({ type: StoryResponse })
