@@ -282,7 +282,7 @@ export class StoryController {
 
   // Favorite methods
   @Permissions(Permission.CREATE_FAVORITE)
-  @Post(':id/favorite/add')
+  @Post('favorite/add')
   @ApiOperation({ summary: 'Add favorite for story' })
   @ApiOkResponse({
     schema: {
@@ -352,7 +352,7 @@ export class StoryController {
 
   // View methods
   @Permissions(Permission.CREATE_VIEW)
-  @Post(':id/view/add')
+  @Post('view/add')
   @ApiOperation({ summary: 'Add view for story' })
   @ApiOkResponse({
     schema: {
