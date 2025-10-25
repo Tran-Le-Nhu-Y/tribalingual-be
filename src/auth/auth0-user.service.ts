@@ -60,8 +60,7 @@ export class Auth0UserService {
         );
       }
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const data: TokenResponse = await res.json();
+      const data = (await res.json()) as TokenResponse;
       this.managementToken = data.access_token;
       this.tokenExpiresAt = now + data.expires_in * 1000;
       return this.managementToken;
@@ -102,8 +101,7 @@ export class Auth0UserService {
         );
       }
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const data: Auth0User = await res.json();
+      const data = (await res.json()) as Auth0User;
       return data;
     } catch (error: unknown) {
       if (error instanceof HttpException) throw error;
