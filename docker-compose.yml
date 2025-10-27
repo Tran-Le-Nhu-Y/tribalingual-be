@@ -9,3 +9,18 @@ services:
       MYSQL_PASSWORD: test
     ports:
       - '3306:3306'
+    networks:
+      - tribalingual-net
+  be:
+    image: tribalingual-be:latest
+    container_name: tribalingual-be
+    environment:
+      - ENV_FILE=application.yaml
+    ports:
+      - '8080:3000'
+    volumes:
+      - './config/application.dev.yaml:/app/dist/config/application.yaml:ro'
+    networks:
+      - tribalingual-net
+networks:
+  tribalingual-net:
