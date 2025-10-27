@@ -2,7 +2,6 @@ import { Like, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   ConflictException,
-  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -192,21 +191,6 @@ export class StoryService {
       throw new NotFoundException(`User with id ${data.userId} not found`);
     }
 
-    // If story was published, only admin can update story
-    if (story.status === StoryStatus.PUBLISHED) {
-      if (!story.adminId || story.adminId !== data.userId) {
-        throw new ForbiddenException(
-          'You are not allowed to update a published story',
-        );
-      }
-    } else {
-      // If story was not published, author and admin can update story
-      if (story.authorId !== data.userId && story.adminId !== data.userId) {
-        throw new ForbiddenException(
-          'Only the author or an admin can update this story before publish',
-        );
-      }
-    }
     if (data.fileId && data.fileId !== story.fileId) {
       if (story.file) {
         // Delete old file in cloud and old file record in DB
