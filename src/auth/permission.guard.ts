@@ -73,21 +73,19 @@ export class PermissionsGuard implements CanActivate {
     const [type, token] = authHeader;
     return type === 'Bearer' ? token : undefined;
   }
+
   private async ensureUserExists(payload: AuthzPayload): Promise<boolean> {
     const userId = payload.sub;
     if (!userId) return false;
 
-    const userExists = await this.userRepository.findOne({
-      where: { id: userId },
+    const userExists = await this.userRepository.existsBy({
+      id: userId,
     });
-    if (userExists) return true;
+    if (!userExists)
+      await this.userRepository.save({
+        id: userId,
+      });
 
-    const auth0User = await this.auth0UserService.getUserProfile(userId);
-    if (!auth0User) return false;
-
-    await this.userRepository.save({
-      id: auth0User.user_id,
-    });
     return true;
   }
 }

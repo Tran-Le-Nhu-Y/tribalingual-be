@@ -1,15 +1,19 @@
 database:
-  host: 127.0.0.1
+  host: mysql
   port: 3306
   username: test
   password: test
   dbname: test_db
 cloudinary:
-  folder: folder
-  cloud_name: test
-  api_key: test
-  api_secret: test
+  folder:
+  cloud_name:
+  api_key:
+  api_secret:
 auth0:
-  issuer: https://<tenant>.auth0.com/
+  issuer: https://<domain>/
   audience: http://localhost:3000/api
-  jwks: https://<tenant>.auth0.com/.well-known/jwks.json
+  jwks: https://<domain>/.well-known/jwks.json
+  domain:
+  client_id:
+  client_secret:
+  management_api_audience: https://<domain>/api/v2/
