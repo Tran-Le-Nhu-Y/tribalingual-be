@@ -50,6 +50,11 @@ export class UpdateStoryBody {
 
   @IsOptional()
   @IsString()
+  @ApiPropertyOptional({ description: 'Audio link' })
+  audioLink?: string;
+
+  @IsOptional()
+  @IsString()
   @ApiPropertyOptional({ description: 'Content in Hmong' })
   hmongContent?: string;
 

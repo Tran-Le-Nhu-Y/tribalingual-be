@@ -12,6 +12,7 @@ export default interface Story {
   language: string;
   viewLink?: string | null;
   gameLink?: string | null;
+  audioLink?: string | null;
   hmongContent?: string | null;
   englishContent?: string | null;
   vietnameseContent?: string | null;

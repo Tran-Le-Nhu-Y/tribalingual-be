@@ -60,6 +60,9 @@ export default class StoryEntity {
   gameLink?: string;
 
   @Column({ type: 'text', nullable: true })
+  audioLink?: string;
+
+  @Column({ type: 'text', nullable: true })
   hmongContent?: string;
 
   @Column({ type: 'text', nullable: true })

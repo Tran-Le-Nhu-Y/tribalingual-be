@@ -43,6 +43,9 @@ export default class StoryResponse {
   @ApiProperty({ description: 'Access link to play game' })
   gameLink?: string | null;
 
+  @ApiProperty({ description: 'Audio link' })
+  audioLink?: string | null;
+
   @ApiProperty({ description: 'Content in Hmong language' })
   hmongContent?: string | null;
 

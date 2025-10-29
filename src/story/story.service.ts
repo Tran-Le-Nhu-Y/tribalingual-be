@@ -231,6 +231,7 @@ export class StoryService {
       language: data.language,
       viewLink: data.viewLink,
       gameLink: data.gameLink,
+      audioLink: data.audioLink,
       hmongContent: data.hmongContent,
       englishContent: data.englishContent,
       vietnameseContent: data.vietnameseContent,
